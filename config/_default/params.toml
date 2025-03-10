@@ -31,7 +31,7 @@ layoutBackgroundBlur = "enable"
 
 [article]
 showDate = true
-showViews = false
+showViews = true
 showLikes = false
 showDateOnlyInArticle = false
 showDateUpdated = false
