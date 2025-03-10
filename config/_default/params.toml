@@ -20,11 +20,11 @@ showAppearanceSwitcher = true
 showScrollToTop = true
 
 [homepage]
-layout = "hero"
+layout = "list"  # 将 "hero" 改为 "list"，以便显示文章列表
 showRecent = "enable"
 showRecentItems = 5
-showMoreLink = false
-showMoreLinkDest = "/posts/"
+showMoreLink = true  # 启用“查看更多”链接
+showMoreLinkDest = "/posts/"  # 指向文章列表页
 cardView = "enable"
 cardViewScreenWidth = false
 layoutBackgroundBlur = "enable"
