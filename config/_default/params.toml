@@ -20,7 +20,7 @@ showAppearanceSwitcher = true
 showScrollToTop = true
 
 [homepage]
-layout = "list"  # 将 "hero" 改为 "list"，以便显示文章列表
+layout = "hero"  # 将 "hero" 改为 "list"，以便显示文章列表
 showRecent = "enable"
 showRecentItems = 5
 showMoreLink = true  # 启用“查看更多”链接
