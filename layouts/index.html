@@ -1,8 +1,48 @@
 {{ define "main" }}
-  {{ $partial := print "partials/home/" .Site.Params.homepage.layout ".html" }}
-  {{ if templates.Exists $partial }}
-    {{ partial $partial . }}
+
+<!-- 如果 partials/home/hero.html 存在，则加载它 -->
+{{ $partial := print "partials/home/" .Site.Params.homepage.layout ".html" }}
+{{ if templates.Exists $partial }}
+  {{ partial $partial . }}
+{{ else }}
+  <!-- 否则加载默认的 profile.html -->
+  {{ partial "partials/home/profile.html" . }}
+{{ end }}
+
+<!-- 添加显示最近文章的逻辑 -->
+{{ if .Site.Params.homepage.showRecent | default true }}
+  {{ $recentArticles := where .Site.RegularPages "Type" "posts" | first .Site.Params.homepage.showRecentItems }}
+  {{ if gt (len $recentArticles) 0 }}
+    <section class="mt-12">
+      <h2 class="text-3xl font-bold text-neutral-900 dark:text-neutral">最新文章</h2>
+      <div class="mt-6 space-y-8">
+        {{ range $recentArticles }}
+          <article class="border-b pb-8">
+            <h3 class="text-2xl font-bold">
+              <a href="{{ .RelPermalink }}" class="text-neutral-900 dark:text-neutral hover:text-primary-500">{{ .Title }}</a>
+            </h3>
+            <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+              {{ .Date.Format "2006-01-02" }}
+            </div>
+            <div class="mt-4 text-neutral-700 dark:text-neutral-300">
+              {{ .Summary }}
+            </div>
+          </article>
+        {{ end }}
+      </div>
+    </section>
   {{ else }}
-    {{ partial "partials/home/profile.html" . }}
+    <p class="mt-8 text-neutral-500 dark:text-neutral-400">暂无文章。</p>
   {{ end }}
+{{ end }}
+
+<!-- 显示 "Show More" 链接 -->
+{{ if .Site.Params.homepage.showMoreLink | default true }}
+  <div class="mt-8">
+    <a href="{{ .Site.Params.homepage.showMoreLinkDest | default "/posts/" }}" class="text-primary-500 hover:text-primary-600">
+      查看更多文章 →
+    </a>
+  </div>
+{{ end }}
+
 {{ end }}
