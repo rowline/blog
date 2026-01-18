@@ -1,12 +1,11 @@
 {{ define "main" }}
 
-<!-- 如果 partials/home/hero.html 存在，则加载它 -->
-{{ $partial := print "partials/home/" .Site.Params.homepage.layout ".html" }}
-{{ if templates.Exists $partial }}
+{{ $partial := print "home/" .Site.Params.homepage.layout ".html" }}
+
+{{ if templates.Exists (printf "partials/%s" $partial) }}
   {{ partial $partial . }}
 {{ else }}
-  <!-- 否则加载默认的 profile.html -->
-  {{ partial "partials/home/profile.html" . }}
+  {{ partial "home/profile.html" . }}
 {{ end }}
 
 <!-- 添加显示最近文章的逻辑 -->

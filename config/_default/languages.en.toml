@@ -9,6 +9,6 @@ displayName = "EN"
 isoCode = "en"
 rtl = false
 dateFormat = "2 January 2006"
-author = { name = "Rollin", email = "rowlinerollin@gmail.com", image = "img/blowfish_logo.png", imageQuality = 96, headline = "好奇心 同理心 责任心", bio = "A little bit about me", links = [ { email = "mailto:rowlinerollin@gmail.com" }, { github = "https://github.com/rowline" } ] }
+author = { name = "Rollin", email = "rowlinerollin@gmail.com", image = "img/my-avatar.JPG", imageQuality = 96, headline = "好奇心 同理心 责任心", bio = "A little bit about me", links = [ { email = "mailto:rowlinerollin@gmail.com" }, { github = "https://github.com/rowline" } ] }
 logo = "websitelogo.png "
 secondaryLogo = "websitelogo.png "
