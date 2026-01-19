@@ -20,11 +20,11 @@ showAppearanceSwitcher = true
 showScrollToTop = true
 
 [homepage]
-layout = "profile"  # 将 "hero" 改为 "list"，以便显示文章列表
-showRecent = "enable"
+layout = "profile"  # 使用 profile 布局作为头部
+showRecent = "disable" # 已在 index.html 中被全量文章列表替代
 showRecentItems = 5
-showMoreLink = true  # 启用“查看更多”链接
-showMoreLinkDest = "/posts/"  # 指向文章列表页
+showMoreLink = false  # 不再需要，已有分页
+showMoreLinkDest = "/posts/"
 cardView = "enable"
 cardViewScreenWidth = false
 layoutBackgroundBlur = "enable"
