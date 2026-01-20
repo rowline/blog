@@ -20,7 +20,7 @@ publishDir = "public"
 
 enableEmoji = true
 
-# googleAnalytics = "G-XXXXXXXXX"
+googleAnalytics = "G-3E4Q1C5SV2"
 
 [pagination]
   pagerSize = 100
