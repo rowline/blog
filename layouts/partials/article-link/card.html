@@ -4,7 +4,8 @@
   {{ else }}
   <a href="{{ .RelPermalink }}" class="min-w-full">
     {{ end }}
-    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
+    <div
+      class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
 
       {{- with $.Params.images -}}
       {{- range first 6 . }}
@@ -17,17 +18,18 @@
       {{- $url:= .Params.featureimage -}}
       {{ $featured = resources.GetRemote $url }}
       {{ end }}
-      {{- if not $featured }}{{ with .Site.Params.defaultFeaturedImage }}{{ $featured = resources.Get . }}{{ end }}{{ end -}}
+      {{- if not $featured }}{{ with .Site.Params.defaultFeaturedImage }}{{ $featured = resources.Get . }}{{ end }}{{
+      end -}}
       {{ if .Params.hideFeatureImage }}{{ $featured = false }}{{ end }}
       {{- with $featured -}}
       {{ if or $disableImageOptimization (strings.HasSuffix $featured ".svg")}}
-        {{ with . }}
-        <div class="w-full thumbnail_card nozoom" style="background-image:url({{ .RelPermalink }});"></div>
-        {{ end }}
+      {{ with . }}
+      <img src="{{ .RelPermalink }}" class="w-full aspect-video object-cover rounded-t" alt="{{ $.Title }}" />
+      {{ end }}
       {{ else }}
-        {{ with .Resize "600x" }}
-        <div class="w-full thumbnail_card nozoom" style="background-image:url({{ .RelPermalink }});"></div>
-        {{ end }}
+      {{ with .Resize "1200x" }}
+      <img src="{{ .RelPermalink }}" class="w-full aspect-video object-cover rounded-t" alt="{{ $.Title }}" />
+      {{ end }}
       {{ end }}
       {{- else -}}
       {{- with $.Site.Params.images }}
@@ -56,7 +58,8 @@
           </div>
         </div>
         {{ else }}
-        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+        <div
+          class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
           href="{{ .RelPermalink }}">{{ .Title | emojify }}</div>
         {{ end }}
 
@@ -65,7 +68,7 @@
         </div>
 
         {{ if .Params.showSummary | default (.Site.Params.list.showSummary | default false) }}
-        <div class="py-1 prose dark:prose-invert">
+        <div class="py-1 prose dark:prose-invert max-w-full">
           {{ .Summary | plainify }}
         </div>
         {{ end }}
