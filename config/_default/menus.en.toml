@@ -4,14 +4,14 @@ none = "none"
 [[main]]
 name = "Work"
 pre = "blogger"
-url = "http://www.rollin.love"
+url = "/work/"
 identifier = "VaYIUAQowd"
 weight = 9999
 
 [[main]]
 name = "Sports"
 pre = "heart"
-url = "https://rowline.github.io/workouts_page/"
+url = "/sports/"
 identifier = "qPYLstBD77"
 weight = 9999
 

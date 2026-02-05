@@ -4,6 +4,13 @@
       "HUGO_VERSION": "0.120.4"
     }
   },
+  "redirects": [
+    {
+      "source": "/sports",
+      "destination": "/sports/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sports/(.*)",

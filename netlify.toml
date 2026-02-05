@@ -24,6 +24,11 @@ command = "cd exampleSite && hugo --gc --minify -D -b $DEPLOY_PRIME_URL"
 HUGO_VERSION = "0.104.1"
 
 [[redirects]]
+  from = "/sports"
+  to = "/sports/"
+  status = 301
+
+[[redirects]]
   from = "/sports/*"
   to = "/sports/index.html"
   status = 200
