@@ -3,5 +3,11 @@
     "env": {
       "HUGO_VERSION": "0.120.4"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/sports/(.*)",
+      "destination": "/sports/index.html"
+    }
+  ]
 }
