@@ -3,7 +3,7 @@ none = "none"
 
 [[main]]
 name = "Work"
-pre = "blogger"
+pre = "code"
 url = "/work/"
 identifier = "VaYIUAQowd"
 weight = 9999
@@ -13,7 +13,14 @@ name = "Sports"
 pre = "heart"
 url = "/sports/"
 identifier = "qPYLstBD77"
-weight = 9999
+weight = 20
+
+[[main]]
+name = "Race Log"
+pre = "fire"
+url = "/racelog/"
+identifier = "racelog"
+weight = 30
 
 [[footer]]
 none = "none"

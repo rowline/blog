@@ -24,7 +24,8 @@
         <nav class="flex space-x-3">
 
             {{ if not .Site.Params.disableTextInHeader | default true }}
-            <a href="{{ "" | relLangURL }}" class="text-base font-medium text-gray-500 hover:text-gray-900">{{
+            <a href="{{ "" | relLangURL }}"
+                class="text-2xl font-extrabold text-gray-500 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white transition-colors">{{
                 .Site.Title | markdownify
                 }}</a>
             {{ end }}
@@ -41,8 +42,8 @@
             {{ partial "translations.html" . }}
 
             {{ if .Site.Params.enableSearch | default false }}
-            <button id="search-button" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
-                title="{{ i18n " search.open_button_title" }}">
+            <button id="search-button" aria-label="Search"
+                class="text-base hover:text-primary-600 dark:hover:text-primary-400" title="Search">
                 {{ partial "icon.html" "search" }}
             </button>
             {{ end }}
@@ -52,7 +53,8 @@
             {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
             <div
                 class="{{ if .Site.Params.footer.showScrollToTop | default true -}} ltr:mr-14 rtl:ml-14 {{- end }} flex items-center">
-                <button id="appearance-switcher" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                <button id="appearance-switcher" aria-label="Dark mode switcher" type="button"
+                    class="text-base hover:text-primary-600 dark:hover:text-primary-400">
                     <div class="flex items-center justify-center dark:hidden">
                         {{ partial "icon.html" "moon" }}
                     </div>
@@ -71,15 +73,16 @@
             {{ partial "translations.html" . }}
 
             {{ if .Site.Params.enableSearch | default false }}
-            <button id="search-button-mobile" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
-                title="{{ i18n " search.open_button_title" }}">
+            <button id="search-button-mobile" aria-label="Search"
+                class="text-base hover:text-primary-600 dark:hover:text-primary-400" title="Search">
                 {{ partial "icon.html" "search" }}
             </button>
             {{ end }}
 
             {{/* Appearance switch */}}
             {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
-            <button id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400" style="margin-right:5px">
+            <button id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button"
+                class="text-base hover:text-primary-600 dark:hover:text-primary-400" style="margin-right:5px">
                 <div class="flex items-center justify-center dark:hidden">
                     {{ partial "icon.html" "moon" }}
                 </div>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Log - 比赛记录</title>
+    <meta name="description" content="Personal race records including marathons, triathlons, and trail running events">
+
+
+    <!-- Tailwind CSS CDN - Needed for layout utilities -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use class-based dark mode
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+
+    <!-- Blowfish Theme CSS (loaded AFTER Tailwind to override colors) -->
+    <link rel="stylesheet"
+        href="/css/main.bundle.min.425c627fce21a882624b6e3d5ae07da44df1273e8c67532d06df35310ad8d48fab02ad30177c7e4cb30e7542c3752795cad9a432239e5f1f7037de99d7e4890c.css">
+
+    <!-- Custom CSS to force Blowfish theme colors (overrides Tailwind CDN) -->
+    <style>
+        /* Override Tailwind grey colors with Blowfish theme colors */
+        .text-gray-700,
+        .dark .dark\:text-gray-300,
+        a.text-2xl {
+            color: rgb(28, 25, 23) !important;
+        }
+
+        html.dark .text-gray-700,
+        html.dark .dark\:text-gray-300,
+        html.dark a.text-2xl,
+        html.dark .main-menu a,
+        html.dark a.flex p {
+            color: rgb(255, 255, 255) !important;
+        }
+
+        /* Ensure dark mode background uses correct neutral colors */
+        .dark .dark\:bg-neutral-800 {
+            background-color: rgb(41, 37, 36) !important;
+        }
+    </style>
+
+    <!-- Blowfish Theme JS (appearance/dark mode) -->
+    <script
+        src="/js/appearance.min.516a16745bea5a9bd011138d254cc0fd3973cd55ce6e15f3dec763e7c7c2c7448f8fe7b54cca811cb821b0c7e12cd161caace1dd794ac3d34d40937cbcc9ee12.js"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            html {
+                color-scheme: dark;
+            }
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Icon sizing for navigation buttons */
+        .icon {
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <div class="loading">
+            <div class="text-center">
+                <div class="text-lg text-gray-600">Loading Race Log...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // Simple SVG Icons as components
+        const Clock = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        );
+
+        const Trophy = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+        );
+
+        const Activity = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+        );
+
+        const MapPin = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+        );
+
+        const Mountain = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+            </svg>
+        );
+
+        const Waves = ({ size = 24, className = "", fill = "none" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+                <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+                <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+            </svg>
+        );
+
+        const Flame = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+            </svg>
+        );
+
+        const Sun = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        );
+
+        const Moon = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        );
+
+        // --- Components ---
+
+        const StatsHeader = () => (
+            <div className="w-full max-w-4xl mx-auto mb-12">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-8 px-6 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-sm">
+                    <div className="text-center group cursor-default">
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">12</div>
+                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Races Completed</div>
+                    </div>
+
+                    <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
+
+                    <div className="text-center group cursor-default">
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">3:58</div>
+                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Marathon PB</div>
+                    </div>
+
+                    <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
+
+                    <div className="text-center group cursor-default">
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">70.3</div>
+                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Ironman Status</div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const FilterBar = ({ activeFilter, setFilter }) => {
+            const filters = [
+                { id: 'all', icon: Flame, label: '全部', color: 'text-neutral-600 dark:text-neutral-300' },
+                { id: 'marathon', icon: Activity, label: '马拉松', color: 'text-teal-500' },
+                { id: 'triathlon', icon: Trophy, label: '铁人三项', color: 'text-indigo-500' },
+                { id: 'trail', icon: Mountain, label: '越野', color: 'text-amber-500' },
+            ];
+
+            return (
+                <div className="flex justify-center gap-4 mb-12">
+                    <div className="inline-flex p-1.5 bg-neutral-200/50 dark:bg-neutral-800/50 backdrop-blur-md rounded-2xl">
+                        {filters.map((f) => {
+                            const isActive = activeFilter === f.id;
+                            const Icon = f.icon;
+                            return (
+                                <button
+                                    key={f.id}
+                                    onClick={() => setFilter(f.id)}
+                                    className={`
+                        relative flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300
+                        ${isActive
+                                            ? 'bg-white dark:bg-neutral-700 shadow-md scale-100'
+                                            : 'hover:bg-white/50 dark:hover:bg-neutral-700/50 scale-95 opacity-70 hover:opacity-100'
+                                        }
+                      `}
+                                >
+                                    <Icon
+                                        size={18}
+                                        className={isActive ? f.color : 'text-neutral-500'}
+                                    />
+                                    <span className={isActive ? 'text-neutral-800 dark:text-neutral-100' : 'text-neutral-500'}>
+                                        {f.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        const RaceCard = ({ race }) => {
+            return (
+                <div className="group relative w-full h-full break-inside-avoid">
+                    <div className="relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 h-[400px]">
+
+                        {/* Date Badge - Floating */}
+                        <div className="absolute top-4 right-4 z-30 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm shadow-sm border border-white/20 px-3 py-2 rounded-xl flex flex-col items-center min-w-[50px]">
+                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{race.month}</span>
+                            <span className="text-lg font-black text-neutral-800 dark:text-neutral-200 leading-none">{race.year}</span>
+                        </div>
+
+                        {/* Image Background */}
+                        <div className="w-full h-full relative">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                            <img
+                                src={race.image}
+                                alt={race.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+
+                            {/* Overlay Info */}
+                            <div className="absolute bottom-0 left-0 w-full p-6 z-20 text-white">
+                                {/* Tags Row */}
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    <div className={`
+                          inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg backdrop-blur-md border text-xs font-bold tracking-wide
+                          ${race.type === 'marathon' ? 'bg-teal-500/20 border-teal-500/30 text-teal-300' : ''}
+                          ${race.type === 'triathlon' ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300' : ''}
+                          ${race.type === 'trail' ? 'bg-amber-500/20 border-amber-500/30 text-amber-300' : ''}
+                        `}>
+                                        {race.type === 'marathon' && <Activity size={12} />}
+                                        {race.type === 'triathlon' && <Trophy size={12} />}
+                                        {race.type === 'trail' && <Mountain size={12} />}
+                                        {race.category}
+                                    </div>
+
+                                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white/80">
+                                        <MapPin size={10} /> {race.location}
+                                    </div>
+                                </div>
+
+                                <h3 className="text-2xl font-bold leading-tight mb-3 text-shadow-sm group-hover:text-teal-400 transition-colors">
+                                    {race.title}
+                                </h3>
+
+                                <div className="flex items-center gap-6 border-t border-white/10 pt-3">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider mb-0.5">Finish Time</span>
+                                        <div className="flex items-center gap-1.5 font-mono text-lg font-bold text-white">
+                                            <Clock size={14} className="text-teal-400" />
+                                            {race.finishTime}
+                                        </div>
+                                    </div>
+
+                                    {race.pace && (
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider mb-0.5">Pace</span>
+                                            <div className="flex items-center gap-1.5 font-mono text-lg font-bold text-white">
+                                                <Activity size={14} className="text-teal-400" />
+                                                {race.pace}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App Component ---
+
+        function App() {
+            const [filter, setFilter] = useState('all');
+            const [isDark, setIsDark] = useState(false);
+
+            React.useEffect(() => {
+                // Check localStorage first, then system preference
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    setIsDark(true);
+                    document.documentElement.classList.add('dark');
+                } else {
+                    setIsDark(false);
+                    document.documentElement.classList.remove('dark');
+                }
+            }, []);
+
+            const toggleDarkMode = () => {
+                const newIsDark = !isDark;
+                setIsDark(newIsDark);
+                if (newIsDark) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.theme = 'dark';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                }
+            };
+
+            // Mock Data
+            const rawRaces = [
+                {
+                    id: 1,
+                    type: 'marathon',
+                    category: 'Full Marathon',
+                    year: '2025',
+                    month: 'NOV',
+                    dateObj: new Date('2025-11-15'),
+                    title: '南京马拉松',
+                    finishTime: '3:58:21',
+                    pace: '5:39/km',
+                    image: 'https://images.unsplash.com/photo-1596727362302-b8d891c42af8?auto=format&fit=crop&q=80&w=800',
+                    location: 'Nanjing'
+                },
+                {
+                    id: 2,
+                    type: 'triathlon',
+                    category: 'IRONMAN 70.3',
+                    year: '2025',
+                    month: 'SEP',
+                    dateObj: new Date('2025-09-20'),
+                    title: 'IRONMAN 70.3 Xiamen',
+                    finishTime: '6:12:45',
+                    pace: '',
+                    image: 'https://images.unsplash.com/photo-1530143311094-34d807799e8f?auto=format&fit=crop&q=80&w=800',
+                    location: 'Xiamen'
+                },
+                {
+                    id: 3,
+                    type: 'marathon',
+                    category: 'Half Marathon',
+                    year: '2024',
+                    month: 'DEC',
+                    dateObj: new Date('2024-12-01'),
+                    title: '上海国际马拉松',
+                    finishTime: '1:52:10',
+                    pace: '5:18/km',
+                    image: 'https://images.unsplash.com/photo-1535132015016-1077916c2919?auto=format&fit=crop&q=80&w=800',
+                    location: 'Shanghai'
+                },
+                {
+                    id: 4,
+                    type: 'trail',
+                    category: 'Trail 50km',
+                    year: '2024',
+                    month: 'MAY',
+                    dateObj: new Date('2024-05-15'),
+                    title: 'TNV 宁海越野挑战赛',
+                    finishTime: '8:45:30',
+                    pace: '',
+                    image: 'https://images.unsplash.com/photo-1506195439413-5a0d33b66479?auto=format&fit=crop&q=80&w=800',
+                    location: 'Ninghai'
+                },
+                {
+                    id: 5,
+                    type: 'triathlon',
+                    category: 'Olympic Distance',
+                    year: '2023',
+                    month: 'OCT',
+                    dateObj: new Date('2023-10-22'),
+                    title: 'STC 淳安铁人三项',
+                    finishTime: '2:48:15',
+                    pace: '',
+                    image: 'https://images.unsplash.com/photo-1517924610283-dd75c2e0d37d?auto=format&fit=crop&q=80&w=800',
+                    location: 'Chunan'
+                },
+                {
+                    id: 6,
+                    type: 'marathon',
+                    category: 'Full Marathon',
+                    year: '2023',
+                    month: 'MAR',
+                    dateObj: new Date('2023-03-19'),
+                    title: '无锡马拉松',
+                    finishTime: '4:15:22',
+                    pace: '6:03/km',
+                    image: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&q=80&w=800',
+                    location: 'Wuxi'
+                }
+            ];
+
+            // Sorting and Filtering Logic
+            const processedRaces = useMemo(() => {
+                let data = [...rawRaces];
+
+                // 1. Sort by Date (Newest First)
+                data.sort((a, b) => b.dateObj - a.dateObj);
+
+                // 2. Filter
+                if (filter !== 'all') {
+                    data = data.filter(r => r.type === filter);
+                }
+
+                return data;
+            }, [filter]);
+
+            return (
+                <div className="min-h-screen bg-neutral dark:bg-neutral-800 text-neutral-900 dark:text-neutral font-sans selection:bg-teal-500/30 pb-20">
+
+                    {/* Navigation Bar - Wrapped in Container Like Homepage */}
+                    <div className="mx-auto max-w-7xl px-6 sm:px-14 md:px-24 lg:px-32">
+                        <div style={{ paddingLeft: 0, paddingRight: 0, paddingTop: '2px', paddingBottom: '3px' }}
+                            className="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start space-x-3">
+
+                            <div className="flex flex-1 items-center justify-between">
+                                <nav className="flex space-x-3">
+                                    <a href="/"
+                                        className="text-2xl font-extrabold text-gray-500 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white transition-colors">Rollin</a>
+                                </nav>
+
+                                <nav className="hidden md:flex items-center space-x-5 md:ml-12 h-12">
+                                    {/* Sports */}
+                                    <a href="/sports/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="mr-1">
+                                            <span className="relative block icon h-5 w-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <p className="text-base font-medium">Sports</p>
+                                    </a>
+
+                                    {/* Race Log */}
+                                    <a href="/racelog/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="mr-1">
+                                            <span className="relative block icon h-5 w-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path fill="currentColor"
+                                                        d="M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.8 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-2.8-5.6-5.6-11.2-9.8-16.8l-50.6 58.8s-81.4-103.6-87.1-110.6C133.1 243.8 112 273.2 112 306.8C112 37.4 162.6 416 225.7 416z" />
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <p className="text-base font-medium">Race Log</p>
+                                    </a>
+
+                                    {/* Work */}
+                                    <a href="/work/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="mr-1">
+                                            <span className="relative block icon h-5 w-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                                    <path fill="currentColor"
+                                                        d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" />
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <p className="text-base font-medium">Work</p>
+                                    </a>
+
+                                    {/* Search Button */}
+                                    <button id="search-button" aria-label="Search" title="Search"
+                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="relative block icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor"
+                                                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                                            </svg>
+                                        </span>
+                                    </button>
+
+                                    {/* Appearance Switcher */}
+                                    <div className="ltr:mr-14 rtl:ml-14 flex items-center">
+                                        <button onClick={toggleDarkMode} id="appearance-switcher" aria-label="Dark mode switcher" type="button"
+                                            className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                            <div className="flex items-center justify-center dark:hidden">
+                                                <span className="relative block icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                        <path fill="currentColor"
+                                                            d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div className="items-center justify-center hidden dark:flex">
+                                                <span className="relative block icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                        <path fill="currentColor"
+                                                            d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </nav>
+
+                                {/* Mobile Navigation */}
+                                <div className="flex md:hidden items-center space-x-5 md:ml-12 h-12">
+                                    <span></span>
+
+                                    {/* Mobile Search Button */}
+                                    <button id="search-button-mobile" aria-label="Search" title="Search"
+                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="relative block icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path fill="currentColor"
+                                                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                                            </svg>
+                                        </span>
+                                    </button>
+
+                                    {/* Mobile Appearance Switcher */}
+                                    <button onClick={toggleDarkMode} id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button"
+                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400" style={{ marginRight: '5px' }}>
+                                        <div className="flex items-center justify-center dark:hidden">
+                                            <span className="relative block icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                    <path fill="currentColor"
+                                                        d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div className="items-center justify-center hidden dark:flex">
+                                            <span className="relative block icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Mobile Menu Button */}
+                            <div className="-my-2 -mr-2 md:hidden">
+                                <label id="menu-button" className="block">
+                                    <div className="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+                                        <span className="relative block icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div id="menu-wrapper" style={{ paddingTop: '5px' }}
+                                        className="fixed inset-0 z-30 invisible w-screen h-screen m-0 overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50">
+                                        <ul
+                                            className="flex space-y-2 mt-3 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
+                                            <li id="menu-close-button">
+                                                <span className="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400">
+                                                    <span className="relative block icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                            <path fill="currentColor"
+                                                                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </li>
+
+                                            <li className="mb-3"><a href="/sports/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                                <span className="mr-1">
+                                                    <span className="relative block icon h-5 w-5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                            <path fill="currentColor"
+                                                                d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <p className="text-base font-medium">Sports</p>
+                                            </a></li>
+
+                                            <li className="mb-3"><a href="/racelog/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                                <span className="mr-1">
+                                                    <span className="relative block icon h-5 w-5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                            <path fill="currentColor"
+                                                                d="M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.8 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-2.8-5.6-5.6-11.2-9.8-16.8l-50.6 58.8s-81.4-103.6-87.1-110.6C133.1 243.8 112 273.2 112 306.8C112 37.4 162.6 416 225.7 416z" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <p className="text-base font-medium">Race Log</p>
+                                            </a></li>
+
+                                            <li className="mb-3"><a href="/work/" className="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+                                                <span className="mr-1">
+                                                    <span className="relative block icon h-5 w-5">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                                            <path fill="currentColor"
+                                                                d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <p className="text-base font-medium">Work</p>
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        {/* Spacer for fixed header */}
+                        <div className="min-h-[80px]"></div>
+
+                        <main className="max-w-7xl mx-auto px-4 md:px-6">
+
+                            {/* Top Stats Section */}
+                            <StatsHeader />
+
+                            {/* Filter Tabs */}
+                            <FilterBar activeFilter={filter} setFilter={setFilter} />
+
+                            {/* Timeline / Grid Content */}
+                            {processedRaces.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                                    {processedRaces.map((race, index) => (
+                                        <div
+                                            key={race.id}
+                                            className="animate-fade-in-up"
+                                            style={{ animationDelay: `${index * 100}ms` }}
+                                        >
+                                            <RaceCard race={race} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-20 text-neutral-400">
+                                    <div className="inline-block p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
+                                        <Activity size={32} className="opacity-20" />
+                                    </div>
+                                    <p>No races found for this category.</p>
+                                </div>
+                            )}
+
+                            {/* Footer */}
+                            <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-neutral-800 flex justify-center text-neutral-400 text-sm font-mono">
+                                <span className="opacity-50">KEEP PUSHING LIMITS</span>
+                            </div>
+
+                        </main>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
