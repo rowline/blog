@@ -35,38 +35,38 @@
     {{ end }}
 
     {{ if not (.Params.showAuthorBottom | default ( .Site.Params.article.showAuthorBottom | default false)) }}
-      
-      {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
-        {{ $showAuthor = 1 }}
-        {{ partial "author.html" . }}
-      {{ end }}
 
-      {{ range $author := .Page.Params.authors }}
-        {{ $authorData := index $authorsData $author }}
-        {{- if $authorData -}}
-          {{ range $taxonomyname, $taxonomy := $taxonomies }}
-            {{ if (eq $taxonomyname $author) }}
-              {{ $taxonomyLink = delimit (slice $baseURL "authors/" $author "/") "" }}
-            {{ end }}
-          {{ end }}
-          {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
-        {{- end -}}
-      {{ end }}
+    {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
+    {{ $showAuthor = 1 }}
+    {{ partial "author.html" . }}
+    {{ end }}
 
-      {{ if or $taxonomyLink $showAuthor }}
-      <div class="mb-5"></div>
-      {{ end }}
+    {{ range $author := .Page.Params.authors }}
+    {{ $authorData := index $authorsData $author }}
+    {{- if $authorData -}}
+    {{ range $taxonomyname, $taxonomy := $taxonomies }}
+    {{ if (eq $taxonomyname $author) }}
+    {{ $taxonomyLink = delimit (slice $baseURL "authors/" $author "/") "" }}
+    {{ end }}
+    {{ end }}
+    {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
+    {{- end -}}
+    {{ end }}
+
+    {{ if or $taxonomyLink $showAuthor }}
+    <div class="mb-5"></div>
+    {{ end }}
 
     {{ end }}
 
   </header>
-  
+
   <section class="flex flex-col max-w-full mt-0 prose dark:prose-invert lg:flex-row">
-    
+
     {{ if or (and (.Params.showTableOfContents | default (.Site.Params.article.showTableOfContents | default false)) (in
     .TableOfContents "<ul")) (.Site.Params.article.showRelatedPosts | default false) }} <div
       class="order-first lg:ml-auto px-0 lg:order-last ltr:lg:pl-8 rtl:lg:pr-8">
-      <div class="toc ltr:pl-5 rtl:pr-5 print:hidden lg:sticky {{ if hasPrefix .Site.Params.header.layout "fixed" -}}
+      <div class="toc ltr:pl-5 rtl:pr-5 print:hidden lg:sticky {{ if hasPrefix .Site.Params.header.layout " fixed" -}}
         lg:top-[140px]{{ else }}lg:top-10{{ end }}">
 
         {{ if and (.Params.showTableOfContents | default (.Site.Params.article.showTableOfContents | default false)) (in
@@ -76,61 +76,105 @@
       {{ end }}
 
       <div class="min-w-0 min-h-0 max-w-fit">
-        
+
         {{ partial "series/series.html" . }}
 
-        <div class="article-content max-w-prose mb-20">
+        <div id="password-wrapper" class="article-content max-w-prose mb-20 {{ if .Params.password }}hidden{{ end }}">
           {{ .Content }}
           {{ $defaultReplyByEmail := .Site.Params.replyByEmail }}
           {{ $replyByEmail := default $defaultReplyByEmail .Params.replyByEmail }}
           {{ if $replyByEmail }}
-            <strong class="block mt-8">
-              <a target="_blank" 
+          <strong class="block mt-8">
+            <a target="_blank"
               class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-              href="mailto:{{ .Site.Params.Author.email }}?subject={{ replace (printf "Reply to %s" .Title) "\"" "'" }}">
+              href="mailto:{{ .Site.Params.Author.email }}?subject={{ replace (printf " Reply to %s" .Title) "\"" "'" }}">
                 Reply by Email
               </a>
             </strong>
           {{ end }}
         </div>
-        
-        {{ if (.Params.showAuthorBottom | default ( .Site.Params.article.showAuthorBottom | default false)) }}
 
-          {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
-            {{ $showAuthor = 1 }}
-            {{ partial "author.html" . }}
-          {{ end }}
+        {{ if .Params.password }}
+        <div id="password-prompt" class="max-w-prose mb-20 p-8 border-2 border-primary-500 rounded-lg text-center bg-neutral-100 dark:bg-neutral-800">
+            <h2 class="mt-0 text-xl font-bold mb-4">🔐 这是一个受密码保护的文章</h2>
+            <p class="mb-6 text-neutral-600 dark:text-neutral-400">请输入密码以查看内容：</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <input type="password" id="password-input" 
+                    class="px-4 py-2 border rounded-md dark:bg-neutral-900 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                    placeholder="在这里输入密码"
+                    onkeydown="if(event.key === ' Enter') checkPassword()">
+              <button onclick="checkPassword()"
+                class="px-6 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors">
+                Unlock
+              </button>
+        </div>
+        <p id="password-error" class="mt-4 text-red-500 hidden text-sm">密码错误，请重试。</p>
 
-          {{ range $author := .Page.Params.authors }}
-            {{ $authorData := index $authorsData $author }}
-            {{- if $authorData -}}
-              {{ range $taxonomyname, $taxonomy := $taxonomies }}
-                {{ if (eq $taxonomyname $author) }}
-                  {{ $taxonomyLink = delimit (slice $baseURL "authors/" $author "/") "" }}
-                {{ end }}
-              {{ end }}
-              {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
-            {{- end -}}
-          {{ end }}
+        <script>
+          function checkPassword() {
+            const password = "{{ .Params.password }}";
+            const input = document.getElementById('password-input').value;
+            const error = document.getElementById('password-error');
+            const wrapper = document.getElementById('password-wrapper');
+            const prompt = document.getElementById('password-prompt');
 
-          {{ if or $taxonomyLink $showAuthor }}
-          <div class="mb-10"></div>
-          {{ end }}
+            if (input === password) {
+              wrapper.classList.remove('hidden');
+              prompt.classList.add('hidden');
+              // Optional: Store in session storage so it stays unlocked during current session
+              sessionStorage.setItem('unlocked-' + window.location.pathname, 'true');
+            } else {
+              error.classList.remove('hidden');
+              error.classList.add('animate-pulse');
+            }
+          }
 
-        {{ end }}
-
-        {{ partial "series/series-closed.html" . }}
-        {{ partial "sharing-links.html" . }}
-        {{ partial "related.html" . }}  
+          // Auto-unlock if previously unlocked in this session
+          if (sessionStorage.getItem('unlocked-' + window.location.pathname) === 'true') {
+            document.getElementById('password-wrapper').classList.remove('hidden');
+            document.getElementById('password-prompt').classList.add('hidden');
+          }
+        </script>
       </div>
-     
+      {{ end }}
+
+      {{ if (.Params.showAuthorBottom | default ( .Site.Params.article.showAuthorBottom | default false)) }}
+
+      {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
+      {{ $showAuthor = 1 }}
+      {{ partial "author.html" . }}
+      {{ end }}
+
+      {{ range $author := .Page.Params.authors }}
+      {{ $authorData := index $authorsData $author }}
+      {{- if $authorData -}}
+      {{ range $taxonomyname, $taxonomy := $taxonomies }}
+      {{ if (eq $taxonomyname $author) }}
+      {{ $taxonomyLink = delimit (slice $baseURL "authors/" $author "/") "" }}
+      {{ end }}
+      {{ end }}
+      {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
+      {{- end -}}
+      {{ end }}
+
+      {{ if or $taxonomyLink $showAuthor }}
+      <div class="mb-10"></div>
+      {{ end }}
+
+      {{ end }}
+
+      {{ partial "series/series-closed.html" . }}
+      {{ partial "sharing-links.html" . }}
+      {{ partial "related.html" . }}
+      </div>
+
       {{ $translations := .AllTranslations }}
       {{ with .File }}
-        {{ $path := .Path }}
-        {{range $translations}}
-          {{ $lang := print "."  .Lang  ".md" }}
-          {{ $path = replace $path $lang ".md" }}
-        {{end}}
+      {{ $path := .Path }}
+      {{range $translations}}
+      {{ $lang := print "." .Lang ".md" }}
+      {{ $path = replace $path $lang ".md" }}
+      {{end}}
       <script>
         var oid = "views_{{ $path }}"
         var oid_likes = "likes_{{ $path }}"
@@ -139,8 +183,8 @@
       {{ $jsPage = $jsPage | resources.Minify | resources.Fingerprint "sha512" }}
       <script type="text/javascript" src="{{ $jsPage.RelPermalink }}" integrity="{{ $jsPage.Data.Integrity }}"></script>
       {{ end }}
-  
-    </section>
+
+  </section>
   <footer class="pt-8 max-w-prose print:hidden">
 
     {{ partial "article-pagination.html" . }}
