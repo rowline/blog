@@ -24,11 +24,13 @@
       {{- with $featured -}}
       {{ if or $disableImageOptimization (strings.HasSuffix $featured ".svg")}}
       {{ with . }}
-      <img src="{{ .RelPermalink }}" class="w-full aspect-video object-cover rounded-t" alt="{{ $.Title }}" />
+      <img src="{{ .RelPermalink }}" class="w-full object-cover rounded-t"
+        style="max-height: 400px; object-position: center;" alt="{{ $.Title }}" />
       {{ end }}
       {{ else }}
       {{ with .Resize "1200x" }}
-      <img src="{{ .RelPermalink }}" class="w-full aspect-video object-cover rounded-t" alt="{{ $.Title }}" />
+      <img src="{{ .RelPermalink }}" class="w-full object-cover rounded-t"
+        style="max-height: 400px; object-position: center;" alt="{{ $.Title }}" />
       {{ end }}
       {{ end }}
       {{- else -}}
