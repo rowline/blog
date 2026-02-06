@@ -16,6 +16,7 @@
             darkMode: 'class'
         }
     </script>
+    <script src="races.js"></script>
 
     <!-- Blowfish Theme CSS (loaded AFTER Tailwind to override colors) -->
     <link rel="stylesheet"
@@ -197,25 +198,42 @@
         // --- Components ---
 
         const StatsHeader = ({ stats }) => (
-            <div className="w-full max-w-4xl mx-auto mb-12">
-                <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-8 px-6 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-sm">
-                    <div className="text-center group cursor-default">
+            <div className="w-full max-w-7xl mx-auto mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-8 px-6 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-sm relative">
+                    {/* Count */}
+                    <div className="text-center group cursor-default md:col-span-1 col-span-2">
                         <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.count || 0}</div>
-                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Races Completed</div>
+                        <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Completed</div>
                     </div>
 
-                    <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
+                    {/* Dividers for Desktop */}
+                    <div className="hidden md:block absolute top-8 bottom-8 left-[20%] w-px bg-neutral-200 dark:bg-neutral-700" />
+                    <div className="hidden md:block absolute top-8 bottom-8 left-[40%] w-px bg-neutral-200 dark:bg-neutral-700" />
+                    <div className="hidden md:block absolute top-8 bottom-8 left-[60%] w-px bg-neutral-200 dark:bg-neutral-700" />
+                    <div className="hidden md:block absolute top-8 bottom-8 left-[80%] w-px bg-neutral-200 dark:bg-neutral-700" />
 
+                    {/* Full Marathon */}
                     <div className="text-center group cursor-default">
-                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.marathonPB}</div>
-                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Marathon PB</div>
+                        <div className="text-3xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.fullMarathonPB}</div>
+                        <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Marathon</div>
                     </div>
 
-                    <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
-
+                    {/* Half Marathon */}
                     <div className="text-center group cursor-default">
-                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.ironmanStatus}</div>
-                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Ironman Status</div>
+                        <div className="text-3xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.halfMarathonPB}</div>
+                        <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Half Marathon</div>
+                    </div>
+
+                    {/* Full Ironman */}
+                    <div className="text-center group cursor-default">
+                        <div className="text-3xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.fullIronmanPB}</div>
+                        <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Ironman</div>
+                    </div>
+
+                    {/* Ironman 70.3 */}
+                    <div className="text-center group cursor-default">
+                        <div className="text-3xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.ironman703PB}</div>
+                        <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">IM 70.3</div>
                     </div>
                 </div>
             </div>
@@ -335,6 +353,7 @@
         };
 
         const App = () => {
+            // ... (Theme state remains same)
             const [filter, setFilter] = useState('all');
             const [isDark, setIsDark] = useState(false);
 
@@ -366,81 +385,8 @@
 
             // Fetch Data
             useEffect(() => {
-                // Hardcoded Data
-                const rawData = [
-                    {
-                        title: "南京马拉松",
-                        date: "2025-11-15",
-                        type: "marathon",
-                        category: "Full Marathon",
-                        finishTime: "3:58:21",
-                        pace: "5:39/km",
-                        image: "https://images.unsplash.com/photo-1596727362302-b8d891c42af8?auto=format&fit=crop&q=80&w=800",
-                        location: "Nanjing",
-                        month: "NOV",
-                        year: "2025"
-                    },
-                    {
-                        title: "IRONMAN 70.3 Xiamen",
-                        date: "2025-09-20",
-                        type: "triathlon",
-                        category: "IRONMAN 70.3",
-                        finishTime: "6:12:45",
-                        pace: "",
-                        image: "https://images.unsplash.com/photo-1530143311094-34d807799e8f?auto=format&fit=crop&q=80&w=800",
-                        location: "Xiamen",
-                        month: "SEP",
-                        year: "2025"
-                    },
-                    {
-                        title: "TNV 宁海越野挑战赛",
-                        date: "2024-05-15",
-                        type: "trail",
-                        category: "Trail 50km",
-                        finishTime: "8:45:30",
-                        pace: "",
-                        image: "https://images.unsplash.com/photo-1506195439413-5a0d33b66479?auto=format&fit=crop&q=80&w=800",
-                        location: "Ninghai",
-                        month: "MAY",
-                        year: "2024"
-                    },
-                    {
-                        title: "上海国际马拉松",
-                        date: "2024-12-01",
-                        type: "marathon",
-                        category: "Half Marathon",
-                        finishTime: "1:52:10",
-                        pace: "5:18/km",
-                        image: "https://images.unsplash.com/photo-1535132015016-1077916c2919?auto=format&fit=crop&q=80&w=800",
-                        location: "Shanghai",
-                        month: "DEC",
-                        year: "2024"
-                    },
-                    {
-                        title: "STC 淳安铁人三项",
-                        date: "2023-10-22",
-                        type: "triathlon",
-                        category: "Olympic Distance",
-                        finishTime: "2:48:15",
-                        pace: "",
-                        image: "https://images.unsplash.com/photo-1517924610283-dd75c2e0d37d?auto=format&fit=crop&q=80&w=800",
-                        location: "Chunan",
-                        month: "OCT",
-                        year: "2023"
-                    },
-                    {
-                        title: "无锡马拉松",
-                        date: "2023-03-19",
-                        type: "marathon",
-                        category: "Full Marathon",
-                        finishTime: "4:15:22",
-                        pace: "6:03/km",
-                        image: "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&q=80&w=800",
-                        location: "Wuxi",
-                        month: "MAR",
-                        year: "2023"
-                    }
-                ];
+                // Data loaded from races.js
+                const rawData = window.RACE_DATA || [];
 
                 // Simulate network delay slightly for effect
                 setTimeout(() => {
@@ -467,22 +413,32 @@
             const stats = useMemo(() => {
                 const completed = rawRaces.length;
 
-                // Calculate Marathon PB
-                const marathons = rawRaces.filter(r => r.type === 'marathon' && r.finishTime && r.finishTime !== 'loading');
-                const bestMarathon = marathons.length > 0
-                    ? marathons.sort((a, b) => a.finishTime.localeCompare(b.finishTime))[0].finishTime // Show full time including seconds
-                    : '--:--';
+                // Categories
+                const fullMarathons = rawRaces.filter(r => r.category === 'Full Marathon');
+                const halfMarathons = rawRaces.filter(r => r.category === 'Half Marathon');
+                const fullIronmans = rawRaces.filter(r => r.category === 'IRONMAN' || r.category === 'IRONMAN Full' || r.category === 'Full Distance' || (r.type === 'triathlon' && r.category.includes('Full')));
+                const ironman703s = rawRaces.filter(r => r.category === 'IRONMAN 70.3' || r.category === 'Olympic Distance');
 
-                // Calculate Ironman Best
-                const ironmans = rawRaces.filter(r => r.type === 'triathlon' && r.finishTime && r.finishTime !== 'loading');
-                const bestIronman = ironmans.length > 0
-                    ? ironmans.sort((a, b) => a.finishTime.localeCompare(b.finishTime))[0].finishTime // Show full time including seconds
-                    : '--:--';
+                // Helper to convert "H:MM:SS" to seconds
+                const timeToSeconds = (timeStr) => {
+                    if (!timeStr || timeStr === 'loading') return Infinity;
+                    const parts = timeStr.split(':').map(Number);
+                    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+                    if (parts.length === 2) return parts[0] * 3600 + parts[1] * 60;
+                    return Infinity;
+                };
+
+                const getBestTime = (races) => {
+                    if (!races || races.length === 0) return "Starting";
+                    return [...races].sort((a, b) => timeToSeconds(a.finishTime) - timeToSeconds(b.finishTime))[0].finishTime;
+                };
 
                 return {
                     count: completed,
-                    marathonPB: bestMarathon,
-                    ironmanStatus: bestIronman
+                    fullMarathonPB: getBestTime(fullMarathons),
+                    halfMarathonPB: getBestTime(halfMarathons),
+                    fullIronmanPB: getBestTime(fullIronmans),
+                    ironman703PB: getBestTime(ironman703s)
                 };
             }, [rawRaces]);
 
