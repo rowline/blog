@@ -120,7 +120,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useEffect } = React;
 
         // Simple SVG Icons as components
         const Clock = ({ size = 24, className = "" }) => (
@@ -196,26 +196,26 @@
 
         // --- Components ---
 
-        const StatsHeader = () => (
+        const StatsHeader = ({ stats }) => (
             <div className="w-full max-w-4xl mx-auto mb-12">
                 <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-8 px-6 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-sm">
                     <div className="text-center group cursor-default">
-                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">12</div>
-                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Races Completed</div>
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.count || 0}</div>
+                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Races Completed</div>
                     </div>
 
                     <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
 
                     <div className="text-center group cursor-default">
-                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">3:58</div>
-                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Marathon PB</div>
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.marathonPB}</div>
+                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Marathon PB</div>
                     </div>
 
                     <div className="hidden md:block w-px h-12 bg-neutral-200 dark:bg-neutral-700" />
 
                     <div className="text-center group cursor-default">
-                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">70.3</div>
-                        <div className="text-xs uppercase tracking-widest text-neutral-400 font-bold mt-2">Ironman Status</div>
+                        <div className="text-4xl font-black text-neutral-800 dark:text-neutral-100 group-hover:text-teal-500 transition-colors">{stats.ironmanStatus}</div>
+                        <div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-2 uppercase tracking-wider group-hover:text-teal-500/70 transition-colors">Ironman Status</div>
                     </div>
                 </div>
             </div>
@@ -251,7 +251,8 @@
                                         size={18}
                                         className={isActive ? f.color : 'text-neutral-500'}
                                     />
-                                    <span className={isActive ? 'text-neutral-800 dark:text-neutral-100' : 'text-neutral-500'}>
+                                    <span className={isActive ? 'text-neutral-800 dark:text-neutral-100' : 'text-neutral-500'}
+                                    >
                                         {f.label}
                                     </span>
                                 </button>
@@ -333,14 +334,11 @@
             );
         };
 
-        // --- Main App Component ---
-
-        function App() {
+        const App = () => {
             const [filter, setFilter] = useState('all');
             const [isDark, setIsDark] = useState(false);
 
             React.useEffect(() => {
-                // Check localStorage first, then system preference
                 if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     setIsDark(true);
                     document.documentElement.classList.add('dark');
@@ -362,102 +360,131 @@
                 }
             };
 
-            // Mock Data
-            const rawRaces = [
-                {
-                    id: 1,
-                    type: 'marathon',
-                    category: 'Full Marathon',
-                    year: '2025',
-                    month: 'NOV',
-                    dateObj: new Date('2025-11-15'),
-                    title: '南京马拉松',
-                    finishTime: '3:58:21',
-                    pace: '5:39/km',
-                    image: 'https://images.unsplash.com/photo-1596727362302-b8d891c42af8?auto=format&fit=crop&q=80&w=800',
-                    location: 'Nanjing'
-                },
-                {
-                    id: 2,
-                    type: 'triathlon',
-                    category: 'IRONMAN 70.3',
-                    year: '2025',
-                    month: 'SEP',
-                    dateObj: new Date('2025-09-20'),
-                    title: 'IRONMAN 70.3 Xiamen',
-                    finishTime: '6:12:45',
-                    pace: '',
-                    image: 'https://images.unsplash.com/photo-1530143311094-34d807799e8f?auto=format&fit=crop&q=80&w=800',
-                    location: 'Xiamen'
-                },
-                {
-                    id: 3,
-                    type: 'marathon',
-                    category: 'Half Marathon',
-                    year: '2024',
-                    month: 'DEC',
-                    dateObj: new Date('2024-12-01'),
-                    title: '上海国际马拉松',
-                    finishTime: '1:52:10',
-                    pace: '5:18/km',
-                    image: 'https://images.unsplash.com/photo-1535132015016-1077916c2919?auto=format&fit=crop&q=80&w=800',
-                    location: 'Shanghai'
-                },
-                {
-                    id: 4,
-                    type: 'trail',
-                    category: 'Trail 50km',
-                    year: '2024',
-                    month: 'MAY',
-                    dateObj: new Date('2024-05-15'),
-                    title: 'TNV 宁海越野挑战赛',
-                    finishTime: '8:45:30',
-                    pace: '',
-                    image: 'https://images.unsplash.com/photo-1506195439413-5a0d33b66479?auto=format&fit=crop&q=80&w=800',
-                    location: 'Ninghai'
-                },
-                {
-                    id: 5,
-                    type: 'triathlon',
-                    category: 'Olympic Distance',
-                    year: '2023',
-                    month: 'OCT',
-                    dateObj: new Date('2023-10-22'),
-                    title: 'STC 淳安铁人三项',
-                    finishTime: '2:48:15',
-                    pace: '',
-                    image: 'https://images.unsplash.com/photo-1517924610283-dd75c2e0d37d?auto=format&fit=crop&q=80&w=800',
-                    location: 'Chunan'
-                },
-                {
-                    id: 6,
-                    type: 'marathon',
-                    category: 'Full Marathon',
-                    year: '2023',
-                    month: 'MAR',
-                    dateObj: new Date('2023-03-19'),
-                    title: '无锡马拉松',
-                    finishTime: '4:15:22',
-                    pace: '6:03/km',
-                    image: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&q=80&w=800',
-                    location: 'Wuxi'
-                }
-            ];
+            // Data State
+            const [rawRaces, setRawRaces] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            // Fetch Data
+            useEffect(() => {
+                // Hardcoded Data
+                const rawData = [
+                    {
+                        title: "南京马拉松",
+                        date: "2025-11-15",
+                        type: "marathon",
+                        category: "Full Marathon",
+                        finishTime: "3:58:21",
+                        pace: "5:39/km",
+                        image: "https://images.unsplash.com/photo-1596727362302-b8d891c42af8?auto=format&fit=crop&q=80&w=800",
+                        location: "Nanjing",
+                        month: "NOV",
+                        year: "2025"
+                    },
+                    {
+                        title: "IRONMAN 70.3 Xiamen",
+                        date: "2025-09-20",
+                        type: "triathlon",
+                        category: "IRONMAN 70.3",
+                        finishTime: "6:12:45",
+                        pace: "",
+                        image: "https://images.unsplash.com/photo-1530143311094-34d807799e8f?auto=format&fit=crop&q=80&w=800",
+                        location: "Xiamen",
+                        month: "SEP",
+                        year: "2025"
+                    },
+                    {
+                        title: "TNV 宁海越野挑战赛",
+                        date: "2024-05-15",
+                        type: "trail",
+                        category: "Trail 50km",
+                        finishTime: "8:45:30",
+                        pace: "",
+                        image: "https://images.unsplash.com/photo-1506195439413-5a0d33b66479?auto=format&fit=crop&q=80&w=800",
+                        location: "Ninghai",
+                        month: "MAY",
+                        year: "2024"
+                    },
+                    {
+                        title: "上海国际马拉松",
+                        date: "2024-12-01",
+                        type: "marathon",
+                        category: "Half Marathon",
+                        finishTime: "1:52:10",
+                        pace: "5:18/km",
+                        image: "https://images.unsplash.com/photo-1535132015016-1077916c2919?auto=format&fit=crop&q=80&w=800",
+                        location: "Shanghai",
+                        month: "DEC",
+                        year: "2024"
+                    },
+                    {
+                        title: "STC 淳安铁人三项",
+                        date: "2023-10-22",
+                        type: "triathlon",
+                        category: "Olympic Distance",
+                        finishTime: "2:48:15",
+                        pace: "",
+                        image: "https://images.unsplash.com/photo-1517924610283-dd75c2e0d37d?auto=format&fit=crop&q=80&w=800",
+                        location: "Chunan",
+                        month: "OCT",
+                        year: "2023"
+                    },
+                    {
+                        title: "无锡马拉松",
+                        date: "2023-03-19",
+                        type: "marathon",
+                        category: "Full Marathon",
+                        finishTime: "4:15:22",
+                        pace: "6:03/km",
+                        image: "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&q=80&w=800",
+                        location: "Wuxi",
+                        month: "MAR",
+                        year: "2023"
+                    }
+                ];
+
+                // Simulate network delay slightly for effect
+                setTimeout(() => {
+                    const racesWithDate = rawData.map(r => ({
+                        ...r,
+                        dateObj: new Date(r.date)
+                    }));
+                    setRawRaces(racesWithDate);
+                    setLoading(false);
+                }, 300);
+            }, []);
 
             // Sorting and Filtering Logic
             const processedRaces = useMemo(() => {
                 let data = [...rawRaces];
-
-                // 1. Sort by Date (Newest First)
                 data.sort((a, b) => b.dateObj - a.dateObj);
-
-                // 2. Filter
                 if (filter !== 'all') {
                     data = data.filter(r => r.type === filter);
                 }
-
                 return data;
-            }, [filter]);
+            }, [rawRaces, filter]);
+
+            // Calculate Stats
+            const stats = useMemo(() => {
+                const completed = rawRaces.length;
+
+                // Calculate Marathon PB
+                const marathons = rawRaces.filter(r => r.type === 'marathon' && r.finishTime && r.finishTime !== 'loading');
+                const bestMarathon = marathons.length > 0
+                    ? marathons.sort((a, b) => a.finishTime.localeCompare(b.finishTime))[0].finishTime // Show full time including seconds
+                    : '--:--';
+
+                // Calculate Ironman Best
+                const ironmans = rawRaces.filter(r => r.type === 'triathlon' && r.finishTime && r.finishTime !== 'loading');
+                const bestIronman = ironmans.length > 0
+                    ? ironmans.sort((a, b) => a.finishTime.localeCompare(b.finishTime))[0].finishTime // Show full time including seconds
+                    : '--:--';
+
+                return {
+                    count: completed,
+                    marathonPB: bestMarathon,
+                    ironmanStatus: bestIronman
+                };
+            }, [rawRaces]);
 
             return (
                 <div className="min-h-screen bg-neutral dark:bg-neutral-800 text-neutral-900 dark:text-neutral font-sans selection:bg-teal-500/30 pb-20">
@@ -652,19 +679,38 @@
                                 </label>
                             </div>
                         </div>
-                        {/* Spacer for fixed header */}
-                        <div className="min-h-[80px]"></div>
+                    </div>
+                    {/* Spacer for fixed header */}
+                    <div className="min-h-[80px]"></div>
 
-                        <main className="max-w-7xl mx-auto px-4 md:px-6">
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 mt-[5px]">
 
+                        {/* Header Section */}
+                        <header className="mb-16 md:mb-24 pt-0 md:pt-4 text-center relative">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-teal-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+                            <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-neutral-900 dark:text-neutral-50 relative z-10">
+                                RACE<span className="text-teal-500">LOG</span>
+                            </h1>
+                            <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto font-light leading-relaxed">
+                                Tracking every mile, every transition, and every finish line. <br className="hidden md:inline" />A digital trophy room of endurance.
+                            </p>
+                        </header>
+
+                        {/* Main Content Area */}
+                        <main>
                             {/* Top Stats Section */}
-                            <StatsHeader />
+                            <StatsHeader stats={stats} />
 
                             {/* Filter Tabs */}
                             <FilterBar activeFilter={filter} setFilter={setFilter} />
 
                             {/* Timeline / Grid Content */}
-                            {processedRaces.length > 0 ? (
+                            {loading ? (
+                                <div className="text-center py-20">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+                                    <p className="mt-4 text-neutral-400">Loading races...</p>
+                                </div>
+                            ) : processedRaces.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                                     {processedRaces.map((race, index) => (
                                         <div
@@ -684,19 +730,19 @@
                                     <p>No races found for this category.</p>
                                 </div>
                             )}
-
-                            {/* Footer */}
-                            <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-neutral-800 flex justify-center text-neutral-400 text-sm font-mono">
-                                <span className="opacity-50">KEEP PUSHING LIMITS</span>
-                            </div>
-
                         </main>
-                    </div>
-                </div>
-            );
-        }
 
-        // Render the app
+                        {/* Footer */}
+                        <footer className="mt-24 py-12 text-center border-t border-neutral-200 dark:border-neutral-800/50">
+                            <p className="text-neutral-400 text-sm">
+                                &copy; {new Date().getFullYear()} RaceLog. Keep Pushing.
+                            </p>
+                        </footer>
+                    </div >
+                </div >
+            );
+        };
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
