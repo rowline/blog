@@ -1,17 +1,204 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/sports/images/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Workouts Page</title>
-    <script type="module" crossorigin src="/sports/assets/index-5c2f4db5.js"></script>
-    <link rel="modulepreload" crossorigin href="/sports/assets/vendors-78eeaf98.js">
-    <link rel="modulepreload" crossorigin href="/sports/assets/activities-6ed5b64c.js">
-    <link rel="stylesheet" href="/sports/assets/index-3d9b858c.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/sports/images/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workouts Page</title>
+  <script type="module" crossorigin src="/sports/assets/index-5c2f4db5.js"></script>
+  <link rel="modulepreload" crossorigin href="/sports/assets/vendors-78eeaf98.js">
+  <link rel="modulepreload" crossorigin href="/sports/assets/activities-6ed5b64c.js">
+  <link rel="stylesheet" href="/sports/assets/index-3d9b858c.css">
+  <style>
+    /* Override navigation colors to match homepage - using attribute selectors for max specificity */
+    a[href="/"],
+    a[href="/sports/"],
+    a[href="/racelog/"],
+    a[href="/work/"],
+    a[href="/sports/"] p,
+    a[href="/racelog/"] p,
+    a[href="/work/"] p {
+      color: rgb(23, 23, 23) !important;
+      /* Dark gray for light mode */
+    }
+
+    a[href="/sports/"]:hover,
+    a[href="/racelog/"]:hover,
+    a[href="/work/"]:hover {
+      color: rgb(101, 163, 13) !important;
+      /* primary-600 for light mode hover */
+    }
+
+    /* Fix navigation bar vertical position to match homepage (verified at centerY 26px) */
+    .main-menu {
+      margin-top: -7px !important;
+      /* Shift up by 7px to match homepage vertical position exactly */
+    }
+
+    /* Fix search button position and spacing to match homepage (40px gap from Work link) */
+    #search-button {
+      color: rgb(23, 23, 23) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      margin-left: 40px !important;
+      /* 40px gap to match homepage spacing between Work link and search button */
+    }
+
+    /* Fix appearance switcher colors and alignment (20px gap from search button) */
+    button[aria-label="Dark mode switcher"] {
+      color: rgb(23, 23, 23) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      margin-left: 20px !important;
+      /* 20px gap to match homepage spacing */
+    }
+
+    /* Remove extra margin from switcher's parent container */
+    .ltr\:mr-14.rtl\:ml-14.flex.items-center {
+      margin-left: 0px !important;
+      /* Nav has space-x-5 (20px) built-in, override redundant margin */
+    }
+
+    /* Use html.dark selector instead of media query to match site's dark mode implementation */
+    html.dark a[href="/"],
+    html.dark a[href="/sports/"],
+    html.dark a[href="/racelog/"],
+    html.dark a[href="/work/"],
+    html.dark a[href="/sports/"] p,
+    html.dark a[href="/racelog/"] p,
+    html.dark a[href="/work/"] p {
+      color: rgb(255, 255, 255) !important;
+      /* White for dark mode */
+    }
+
+    html.dark a[href="/sports/"]:hover,
+    html.dark a[href="/racelog/"]:hover,
+    html.dark a[href="/work/"]:hover {
+      color: rgb(163, 230, 53) !important;
+      /* primary-400 for dark mode hover */
+    }
+
+    /* Button colors in dark mode */
+    html.dark #search-button,
+    html.dark button[aria-label="Dark mode switcher"] {
+      color: rgb(255, 255, 255) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- Mobile Menu Overlay (injected for hamburger menu functionality) -->
+  <div id="menu-wrapper"
+    style="padding-top:5px; position:fixed; inset:0; z-index:30; visibility:hidden; width:100vw; height:100vh; margin:0; overflow:auto; transition:opacity 0.3s; opacity:0; cursor:default; background-color:rgba(245,245,245,0.5); backdrop-filter:blur(8px);">
+    <ul
+      style="display:flex; flex-direction:column; align-items:flex-end; width:100%; padding:1.5rem; margin:0.75rem auto 0; max-width:80rem; list-style:none;">
+
+      <li id="menu-close-button">
+        <span class="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400"
+          style="cursor:pointer; display:inline-block; vertical-align:text-bottom;">
+          <!-- X close icon -->
+          <span class="relative block icon" style="position:relative; display:block;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" style="width: 1.25rem; height: 1.25rem;">
+              <path fill="currentColor"
+                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+            </svg>
+          </span>
+        </span>
+      </li>
+
+      <li style="margin-bottom:0.75rem;">
+        <a href="/sports/" style="display:flex; align-items:center; color:#6b7280; text-decoration:none;">
+          <span style="margin-right:0.25rem;">
+            <span style="position:relative; display:block; width: 1.25rem; height: 1.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor"
+                  d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+              </svg>
+            </span>
+          </span>
+          <p style="font-size:1rem; font-weight:500; margin:0;">Sports</p>
+        </a>
+      </li>
+
+      <li style="margin-bottom:0.75rem;">
+        <a href="/racelog/" style="display:flex; align-items:center; color:#6b7280; text-decoration:none;">
+          <span style="margin-right:0.25rem;">
+            <span style="position:relative; display:block; width: 1.25rem; height: 1.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                <path fill="currentColor"
+                  d="M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.8 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-2.8-5.6-5.6-11.2-9.8-16.8l-50.6 58.8s-81.4-103.6-87.1-110.6C133.1 243.8 112 273.2 112 306.8C112 37.4 162.6 416 225.7 416z" />
+              </svg>
+            </span>
+          </span>
+          <p style="font-size:1rem; font-weight:500; margin:0;">Race Log</p>
+        </a>
+      </li>
+
+      <li style="margin-bottom:0.75rem;">
+        <a href="/work/" style="display:flex; align-items:center; color:#6b7280; text-decoration:none;">
+          <span style="margin-right:0.25rem;">
+            <span style="position:relative; display:block; width: 1.25rem; height: 1.25rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                <path fill="currentColor"
+                  d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" />
+              </svg>
+            </span>
+          </span>
+          <p style="font-size:1rem; font-weight:500; margin:0;">Work</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Mobile Menu Toggle Script -->
+  <script>
+    // Wait for the React app to render before attaching listeners
+    // Use a longer delay to ensure the bundled app has fully loaded
+    setTimeout(function () {
+      var menuButton = document.getElementById("menu-button");
+      var menuCloseButton = document.getElementById("menu-close-button");
+      var menuWrapper = document.getElementById("menu-wrapper");
+
+      if (!menuButton) {
+        console.warn('Menu button not found - React app may not have rendered yet');
+        return;
+      }
+
+      if (!menuCloseButton || !menuWrapper) {
+        console.warn('Menu elements not found');
+        return;
+      }
+
+      var menuOpen = false;
+
+      var openMenu = function (e) {
+        if (!menuOpen) {
+          menuOpen = true;
+          document.body.style.overflowY = "hidden";
+          menuButton.style.visibility = "hidden";
+          menuWrapper.style.visibility = "visible";
+          menuWrapper.style.opacity = "1";
+        }
+      };
+
+      var closeMenu = function (e) {
+        if (menuOpen) {
+          menuOpen = false;
+          document.body.style.overflowY = "auto";
+          menuButton.style.visibility = "visible";
+          menuWrapper.style.visibility = "hidden";
+          menuWrapper.style.opacity = "0";
+          if (e) e.stopPropagation();
+        }
+      };
+
+      menuButton.addEventListener("click", openMenu);
+      menuCloseButton.addEventListener("click", closeMenu);
+    }, 500); // 500ms delay for React app to fully render
+  </script>
+</body>
+
 </html>
