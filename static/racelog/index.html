@@ -195,7 +195,150 @@
             </svg>
         );
 
+        const X = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
         // --- Components ---
+
+        // Search Modal Component
+        const SearchModal = ({ isOpen, onClose, searchQuery, setSearchQuery, filteredRaces }) => {
+            const inputRef = React.useRef(null);
+
+            React.useEffect(() => {
+                if (isOpen && inputRef.current) {
+                    inputRef.current.focus();
+                }
+            }, [isOpen]);
+
+            React.useEffect(() => {
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        onClose();
+                    }
+                };
+
+                if (isOpen) {
+                    document.addEventListener('keydown', handleEscape);
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'unset';
+                }
+
+                return () => {
+                    document.removeEventListener('keydown', handleEscape);
+                    document.body.style.overflow = 'unset';
+                };
+            }, [isOpen, onClose]);
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4" onClick={onClose}>
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+                    {/* Search Container */}
+                    <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                        {/* Search Input */}
+                        <div className="flex items-center gap-3 p-4 border-b border-neutral-200 dark:border-neutral-700">
+                            <Activity size={20} className="text-neutral-400" />
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search races by name, location, or category..."
+                                className="flex-1 bg-transparent text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 outline-none text-lg"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            )}
+                            <button
+                                onClick={onClose}
+                                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Search Results */}
+                        <div className="max-h-96 overflow-y-auto p-4">
+                            {searchQuery ? (
+                                filteredRaces.length > 0 ? (
+                                    <div className="space-y-3">
+                                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">
+                                            Found {filteredRaces.length} race{filteredRaces.length !== 1 ? 's' : ''}
+                                        </p>
+                                        {filteredRaces.map((race) => (
+                                            <div
+                                                key={race.id}
+                                                className="flex items-center gap-4 p-3 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+                                                onClick={() => {
+                                                    // Scroll to race card
+                                                    onClose();
+                                                    setTimeout(() => {
+                                                        const element = document.querySelector(`[data-race-id="${race.id}"]`);
+                                                        if (element) {
+                                                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                        }
+                                                    }, 100);
+                                                }}
+                                            >
+                                                <img
+                                                    src={race.image}
+                                                    alt={race.title}
+                                                    className="w-16 h-16 rounded-lg object-cover"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-bold text-neutral-900 dark:text-neutral-100 truncate">
+                                                        {race.title}
+                                                    </h3>
+                                                    <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                                                        <span>{race.location}</span>
+                                                        <span>•</span>
+                                                        <span>{race.category}</span>
+                                                        <span>•</span>
+                                                        <span>{race.month} {race.year}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="flex items-center gap-1 text-sm font-mono font-bold text-teal-500">
+                                                        <Clock size={14} />
+                                                        {race.finishTime}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 text-neutral-400">
+                                        <div className="inline-block p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
+                                            <Activity size={32} className="opacity-20" />
+                                        </div>
+                                        <p>No races found matching "{searchQuery}"</p>
+                                        <p className="text-sm mt-2">Try searching by name, location, or category</p>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="text-center py-12 text-neutral-400">
+                                    <Activity size={32} className="opacity-20 mx-auto mb-4" />
+                                    <p>Start typing to search races...</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const StatsHeader = ({ stats }) => (
             <div className="w-full max-w-7xl mx-auto mb-12">
@@ -283,7 +426,7 @@
 
         const RaceCard = ({ race }) => {
             return (
-                <div className="group relative w-full h-full break-inside-avoid">
+                <div className="group relative w-full h-full break-inside-avoid" data-race-id={race.id}>
                     <div className="relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 h-[400px]">
 
                         {/* Date Badge - Floating */}
@@ -353,9 +496,11 @@
         };
 
         const App = () => {
-            // ... (Theme state remains same)
+            // State Management
             const [filter, setFilter] = useState('all');
             const [isDark, setIsDark] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [isSearchVisible, setIsSearchVisible] = useState(false);
 
             React.useEffect(() => {
                 if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -390,8 +535,9 @@
 
                 // Simulate network delay slightly for effect
                 setTimeout(() => {
-                    const racesWithDate = rawData.map(r => ({
+                    const racesWithDate = rawData.map((r, index) => ({
                         ...r,
+                        id: `race-${index}`,
                         dateObj: new Date(r.date)
                     }));
                     setRawRaces(racesWithDate);
@@ -403,11 +549,34 @@
             const processedRaces = useMemo(() => {
                 let data = [...rawRaces];
                 data.sort((a, b) => b.dateObj - a.dateObj);
+
+                // Filter by type (marathon/triathlon/trail)
                 if (filter !== 'all') {
                     data = data.filter(r => r.type === filter);
                 }
+
+                // Filter by search query
+                if (searchQuery.trim()) {
+                    const query = searchQuery.toLowerCase().trim();
+                    data = data.filter(race => {
+                        return (
+                            race.title.toLowerCase().includes(query) ||
+                            race.location.toLowerCase().includes(query) ||
+                            race.category.toLowerCase().includes(query)
+                        );
+                    });
+                }
+
                 return data;
-            }, [rawRaces, filter]);
+            }, [rawRaces, filter, searchQuery]);
+
+            // Toggle search modal
+            const toggleSearch = () => {
+                setIsSearchVisible(!isSearchVisible);
+                if (!isSearchVisible) {
+                    setSearchQuery('');
+                }
+            };
 
             // Calculate Stats
             const stats = useMemo(() => {
@@ -444,6 +613,14 @@
 
             return (
                 <div className="min-h-screen bg-neutral dark:bg-neutral-800 text-neutral-900 dark:text-neutral font-sans selection:bg-teal-500/30 pb-20">
+                    {/* Search Modal */}
+                    <SearchModal
+                        isOpen={isSearchVisible}
+                        onClose={() => setIsSearchVisible(false)}
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        filteredRaces={processedRaces}
+                    />
 
                     {/* Navigation Bar - Wrapped in Container Like Homepage */}
                     <div className="mx-auto max-w-7xl px-6 sm:px-14 md:px-24 lg:px-32">
@@ -498,6 +675,7 @@
 
                                     {/* Search Button */}
                                     <button id="search-button" aria-label="Search" title="Search"
+                                        onClick={toggleSearch}
                                         className="text-base hover:text-primary-600 dark:hover:text-primary-400">
                                         <span className="relative block icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -537,6 +715,7 @@
 
                                     {/* Mobile Search Button */}
                                     <button id="search-button-mobile" aria-label="Search" title="Search"
+                                        onClick={toggleSearch}
                                         className="text-base hover:text-primary-600 dark:hover:text-primary-400">
                                         <span className="relative block icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
