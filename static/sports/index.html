@@ -243,6 +243,349 @@
       menuCloseButton.addEventListener("click", closeMenu);
     }, 500); // 500ms delay for React app to fully render
   </script>
+
+  <!-- Search Functionality -->
+  <script>
+    // Wait for React app to load workout data
+    setTimeout(function () {
+      var searchButton = document.getElementById("search-button");
+      if (!searchButton) {
+        console.warn('Search button not found');
+        return;
+      }
+
+      // Create search modal
+      var searchModal = document.createElement('div');
+      searchModal.id = 'workout-search-modal';
+      searchModal.style.cssText = `
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        overflow-y: auto;
+      `;
+
+      var modalContent = document.createElement('div');
+      modalContent.style.cssText = `
+        background-color: white;
+        margin: 2rem auto;
+        padding: 2rem;
+        max-width: 800px;
+        width: 90%;
+        border-radius: 0.5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      `;
+
+      // Add dark mode styles
+      if (document.documentElement.classList.contains('dark')) {
+        modalContent.style.backgroundColor = '#1f2937';
+        modalContent.style.color = '#f9fafb';
+      }
+
+      modalContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; font-weight: 600; margin: 0;">Search Workouts</h2>
+          <button id="close-search" style="cursor: pointer; padding: 0.5rem; border: none; background: none; font-size: 1.5rem; color: #6b7280;">&times;</button>
+        </div>
+        
+        <input 
+          type="text" 
+          id="workout-search-input" 
+          placeholder="Search by name, type, or location..." 
+          style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem; margin-bottom: 1rem; color: #111827; background-color: white;"
+        />
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <select id="type-filter" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #111827; background-color: white;">
+            <option value="">All Types</option>
+            <option value="Run">Run</option>
+            <option value="Swim">Swim</option>
+            <option value="Ride">Ride</option>
+            <option value="Hike">Hike</option>
+            <option value="VirtualRide">VirtualRide</option>
+            <option value="Rowing">Rowing</option>
+          </select>
+        </div>
+        
+        <div id="search-results" style="max-height: 400px; overflow-y: auto;">
+          <p style="text-align: center; color: #6b7280;">Enter a search term to find workouts</p>
+        </div>
+      `;
+
+      searchModal.appendChild(modalContent);
+      document.body.appendChild(searchModal);
+
+      var searchInput = document.getElementById('workout-search-input');
+      var typeFilter = document.getElementById('type-filter');
+      var searchResults = document.getElementById('search-results');
+      var closeSearchBtn = document.getElementById('close-search');
+
+      // Store all activities data
+      var allActivitiesData = [];
+      var dataLoaded = false;
+
+      // Function to load all workout data from the activities module
+      async function loadAllActivities() {
+        if (dataLoaded) return allActivitiesData;
+
+        try {
+          // Dynamic import of the activities data
+          const module = await import('/sports/assets/activities-6ed5b64c.js');
+
+          // The data is exported as 'a' in the module
+          if (module.a && Array.isArray(module.a)) {
+            allActivitiesData = module.a.map(function (activity) {
+              return {
+                date: activity.start_date_local || '',
+                name: activity.name || '',
+                distance: formatDistance(activity.distance || 0),
+                pace: activity.pace || '',
+                type: activity.type || '',
+                location: activity.location_country || ''
+              };
+            });
+            dataLoaded = true;
+          }
+        } catch (error) {
+          console.error('Failed to load activities data:', error);
+          // Fallback to DOM scraping if import fails
+          allActivitiesData = getWorkoutDataFromDOM();
+          dataLoaded = true;
+        }
+
+        return allActivitiesData;
+      }
+
+      // Helper function to format distance (from meters to km)
+      function formatDistance(meters) {
+        var km = meters / 1000;
+        return km.toFixed(2);
+      }
+
+      // Fallback function to get workout data from the DOM table
+      function getWorkoutDataFromDOM() {
+        var workouts = [];
+        var rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(function (row) {
+          var cells = row.querySelectorAll('td');
+          if (cells.length >= 4) {
+            workouts.push({
+              date: cells[0]?.textContent?.trim() || '',
+              name: cells[1]?.textContent?.trim() || '',
+              distance: cells[2]?.textContent?.trim() || '',
+              pace: cells[3]?.textContent?.trim() || '',
+            });
+          }
+        });
+
+        return workouts;
+      }
+
+      // Function to perform search
+      async function performSearch() {
+        var query = searchInput.value.toLowerCase().trim();
+        var selectedType = typeFilter.value.toLowerCase();
+
+        // Show loading indicator
+        if (!dataLoaded) {
+          searchResults.innerHTML = '<p style="text-align: center; color: #6b7280;">Loading workouts...</p>';
+        }
+
+        // Load all activities data
+        var workouts = await loadAllActivities();
+
+        if (!query && !selectedType) {
+          searchResults.innerHTML = '<p style="text-align: center; color: #6b7280;">Enter a search term to find workouts</p>';
+          return;
+        }
+
+        var filtered = workouts.filter(function (workout) {
+          var matchesQuery = !query ||
+            workout.name.toLowerCase().includes(query) ||
+            workout.date.toLowerCase().includes(query) ||
+            workout.location.toLowerCase().includes(query);
+
+          var matchesType = !selectedType ||
+            workout.type.toLowerCase() === selectedType ||
+            workout.name.toLowerCase().includes(selectedType);
+
+          return matchesQuery && matchesType;
+        });
+
+        if (filtered.length === 0) {
+          searchResults.innerHTML = '<p style="text-align: center; color: #6b7280;">No workouts found</p>';
+          return;
+        }
+
+        var resultsHTML = '<div style="background-color: #f9fafb; border-radius: 0.375rem; padding: 1rem;">';
+        resultsHTML += '<p style="margin: 0 0 0.75rem 0; font-weight: 600;">Found ' + filtered.length + ' workout(s) (searching all ' + workouts.length + ' activities):</p>';
+        resultsHTML += '<ul style="list-style: none; padding: 0; margin: 0;">';
+
+        filtered.forEach(function (workout) {
+          resultsHTML += '<li class="workout-result-item" data-workout-date="' + workout.date + '" style="padding: 0.75rem; margin-bottom: 0.5rem; background-color: white; border-radius: 0.25rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s;">';
+          resultsHTML += '<div style="font-weight: 600;">' + workout.name + '</div>';
+          resultsHTML += '<div style="font-size: 0.875rem; color: #6b7280;">' + workout.date + ' • ' + workout.distance + ' km';
+          if (workout.location) {
+            resultsHTML += ' • ' + workout.location;
+          }
+          resultsHTML += '</div>';
+          resultsHTML += '</li>';
+        });
+
+        resultsHTML += '</ul></div>';
+        searchResults.innerHTML = resultsHTML;
+
+        // Add click handlers to result items
+        var resultItems = searchResults.querySelectorAll('.workout-result-item');
+        resultItems.forEach(function (item) {
+          item.addEventListener('mouseenter', function () {
+            this.style.backgroundColor = '#f3f4f6';
+            this.style.borderColor = '#a3e635';
+          });
+
+          item.addEventListener('mouseleave', function () {
+            this.style.backgroundColor = 'white';
+            this.style.borderColor = '#e5e7eb';
+          });
+
+          item.addEventListener('click', function () {
+            var targetDate = this.getAttribute('data-workout-date');
+            jumpToWorkout(targetDate);
+          });
+        });
+      }
+
+      // Helper function to extract year from date string
+      function getYearFromDate(dateString) {
+        // dateString format: "2023-04-24 06:30:45"
+        return dateString.split('-')[0];
+      }
+
+      // Helper function to get currently active year
+      function getCurrentYear() {
+        var yearButtons = document.querySelectorAll('li');
+        for (var i = 0; i < yearButtons.length; i++) {
+          var btn = yearButtons[i];
+          var text = btn.textContent.trim();
+          if (text.match(/^(202[3-6]|Total)$/)) {
+            var color = window.getComputedStyle(btn).color;
+            if (color === 'rgb(0, 237, 94)') {
+              return text;
+            }
+          }
+        }
+        return null;
+      }
+
+      // Helper function to switch to a specific year
+      function switchToYear(targetYear) {
+        var yearButtons = document.querySelectorAll('li');
+        for (var i = 0; i < yearButtons.length; i++) {
+          var btn = yearButtons[i];
+          if (btn.textContent.trim() === targetYear) {
+            btn.click();
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // Enhanced function to jump to a workout in the table
+      async function jumpToWorkout(dateString) {
+        // Close the search modal
+        searchModal.style.display = 'none';
+
+        // Extract target year from date
+        var targetYear = getYearFromDate(dateString);
+        var currentYear = getCurrentYear();
+
+        // Switch year if needed (and not viewing "Total")
+        if (targetYear !== currentYear && currentYear !== 'Total' && targetYear !== 'Total') {
+          switchToYear(targetYear);
+          // Wait for React to update the table
+          await new Promise(function (resolve) { setTimeout(resolve, 500); });
+        }
+
+        // Find the table row with matching date
+        var rows = document.querySelectorAll('table tbody tr');
+        var targetRow = null;
+
+        rows.forEach(function (row) {
+          var cells = row.querySelectorAll('td');
+          // Search all cells for the date string (date is in the last column)
+          for (var i = 0; i < cells.length; i++) {
+            if (cells[i]?.textContent?.trim() === dateString) {
+              targetRow = row;
+              break;
+            }
+          }
+        });
+
+        if (targetRow) {
+          // Click row to show map trajectory (works even if row is out of viewport)
+          targetRow.click();
+
+          // Wait a bit to see if trajectory loads
+          await new Promise(function (resolve) { setTimeout(resolve, 800); });
+
+          // Check if there's a "no map data" message or if trajectory didn't load
+          // If no trajectory, switch to Total view to show all workouts heatmap
+          var noMapIndicator = document.body.textContent.includes('No map data') ||
+            document.body.textContent.includes('no map data') ||
+            document.body.textContent.includes('无地图数据');
+
+          if (noMapIndicator) {
+            // Switch to Total view to show all workouts
+            switchToYear('Total');
+          }
+        }
+      }
+
+      // Event listeners
+      searchButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        searchModal.style.display = 'block';
+        setTimeout(function () { searchInput.focus(); }, 100);
+      });
+
+      closeSearchBtn.addEventListener('click', function () {
+        searchModal.style.display = 'none';
+      });
+
+      searchModal.addEventListener('click', function (e) {
+        if (e.target === searchModal) {
+          searchModal.style.display = 'none';
+        }
+      });
+
+      searchInput.addEventListener('input', performSearch);
+      typeFilter.addEventListener('change', performSearch);
+
+      // ESC key to close
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && searchModal.style.display === 'block') {
+          searchModal.style.display = 'none';
+        }
+      });
+
+      // Update dark mode styles dynamically
+      var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (mutation.attributeName === 'class') {
+            var isDark = document.documentElement.classList.contains('dark');
+            modalContent.style.backgroundColor = isDark ? '#1f2937' : 'white';
+            modalContent.style.color = isDark ? '#f9fafb' : '#111827';
+          }
+        });
+      });
+
+      observer.observe(document.documentElement, { attributes: true });
+
+    }, 1000); // Wait 1 second for React app to fully load
+  </script>
 </body>
 
 </html>
