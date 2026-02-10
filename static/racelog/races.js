@@ -1,4 +1,30 @@
 window.RACE_DATA = [
+    // --- TEST RACE (FUTURE) ---
+    {
+        title: "2026膳美师·宁波马拉松",
+        date: "2026-06-15",
+        type: "marathon",
+        category: "Half Marathon",
+        finishTime: "TBD",
+        pace: "",
+        image: "/images/races/2025-Nanjing.jpg",
+        location: "Ningbo",
+        month: "MAR",
+        year: "2026"
+    },
+    {
+        title: "2026厦门铁人三项公开赛",
+        date: "2026-11-08",
+        type: "triathlon",
+        category: "Ironman 70.3",
+        finishTime: "TBD",
+        pace: "",
+        image: "/images/races/2025-Nanjing.jpg",
+        location: "Xiamen",
+        month: "NOV",
+        year: "2026"
+    },
+
     // --- 2025 RACES ---
     {
         title: "2025南京银行南京马拉松",

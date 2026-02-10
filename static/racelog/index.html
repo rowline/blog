@@ -488,6 +488,154 @@
             );
         };
 
+        // Countdown Component for Upcoming Races
+        const Countdown = ({ targetDate, raceTitle }) => {
+            const [timeLeft, setTimeLeft] = useState(null);
+
+            React.useEffect(() => {
+                const calculateTimeLeft = () => {
+                    const now = new Date();
+                    const target = new Date(targetDate);
+                    const difference = target - now;
+
+                    if (difference > 0) {
+                        return {
+                            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                            minutes: Math.floor((difference / 1000 / 60) % 60),
+                            seconds: Math.floor((difference / 1000) % 60)
+                        };
+                    }
+                    return null;
+                };
+
+                // Initial calculation
+                setTimeLeft(calculateTimeLeft());
+
+                // Update every second
+                const timer = setInterval(() => {
+                    setTimeLeft(calculateTimeLeft());
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, [targetDate]);
+
+            if (!timeLeft) return null;
+
+            return (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-teal-500 via-indigo-500 to-purple-600 relative overflow-hidden">
+                    {/* Animated background circles */}
+                    <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
+                    <div className="absolute bottom-10 right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+
+                    {/* Race title */}
+                    <div className="text-white/90 text-sm font-medium mb-8 px-6 text-center z-10">
+                        倒计时开始
+                    </div>
+
+                    {/* Countdown grid */}
+                    <div className="grid grid-cols-4 gap-3 px-4 z-10">
+                        {/* Days */}
+                        <div className="flex flex-col items-center">
+                            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3 min-w-[60px] border border-white/30 shadow-lg">
+                                <div className="text-4xl font-black text-white text-center leading-none">{timeLeft.days}</div>
+                            </div>
+                            <div className="text-xs text-white/80 mt-2 font-bold">天</div>
+                        </div>
+
+                        {/* Hours */}
+                        <div className="flex flex-col items-center">
+                            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3 min-w-[60px] border border-white/30 shadow-lg">
+                                <div className="text-4xl font-black text-white text-center leading-none">{String(timeLeft.hours).padStart(2, '0')}</div>
+                            </div>
+                            <div className="text-xs text-white/80 mt-2 font-bold">时</div>
+                        </div>
+
+                        {/* Minutes */}
+                        <div className="flex flex-col items-center">
+                            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3 min-w-[60px] border border-white/30 shadow-lg">
+                                <div className="text-4xl font-black text-white text-center leading-none">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                            </div>
+                            <div className="text-xs text-white/80 mt-2 font-bold">分</div>
+                        </div>
+
+                        {/* Seconds */}
+                        <div className="flex flex-col items-center">
+                            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3 min-w-[60px] border border-white/30 shadow-lg">
+                                <div className="text-4xl font-black text-white text-center leading-none">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                            </div>
+                            <div className="text-xs text-white/80 mt-2 font-bold">秒</div>
+                        </div>
+                    </div>
+
+                    {/* Coming soon text */}
+                    <div className="mt-8 text-white/70 text-xs font-medium tracking-wider uppercase z-10">
+                        Coming Soon
+                    </div>
+                </div>
+            );
+        };
+
+        // Upcoming Races Section Component
+        const UpcomingRacesSection = ({ upcomingRaces }) => {
+            if (!upcomingRaces || upcomingRaces.length === 0) return null;
+
+            return (
+                <div className="mb-12">
+                    <div className="text-center mb-6">
+                        <h2 className="text-2xl md:text-3xl font-black text-neutral-800 dark:text-neutral-100 mb-2">
+                            即将开始的比赛
+                        </h2>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                            Upcoming Races
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        {upcomingRaces.map((race) => (
+                            <div key={race.id} className="group relative w-full break-inside-avoid">
+                                <div className="relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 h-[400px]">
+                                    {/* Date Badge */}
+                                    <div className="absolute top-4 right-4 z-30 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm shadow-sm border border-white/20 px-3 py-2 rounded-xl flex flex-col items-center min-w-[50px]">
+                                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{race.month}</span>
+                                        <span className="text-lg font-black text-neutral-800 dark:text-neutral-200 leading-none">{race.year}</span>
+                                    </div>
+
+                                    {/* Countdown Display */}
+                                    <div className="w-full h-full relative">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                                        <Countdown targetDate={race.date} raceTitle={race.title} />
+
+                                        {/* Overlay Info */}
+                                        <div className="absolute bottom-0 left-0 w-full p-6 z-20 text-white">
+                                            <div className="flex flex-wrap gap-2 mb-3">
+                                                <div className={`
+                                                    inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg backdrop-blur-md border text-xs font-bold tracking-wide
+                                                    ${race.type === 'marathon' ? 'bg-teal-500/20 border-teal-500/30 text-teal-300' : ''}
+                                                    ${race.type === 'triathlon' ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300' : ''}
+                                                    ${race.type === 'trail' ? 'bg-amber-500/20 border-amber-500/30 text-amber-300' : ''}
+                                                `}>
+                                                    {race.type === 'marathon' && <Activity size={12} />}
+                                                    {race.type === 'triathlon' && <Trophy size={12} />}
+                                                    {race.type === 'trail' && <Mountain size={12} />}
+                                                    {race.category}
+                                                </div>
+                                                <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white/80">
+                                                    <MapPin size={10} /> {race.location}
+                                                </div>
+                                            </div>
+                                            <h3 className="text-2xl font-bold leading-tight text-shadow-sm">
+                                                {race.title}
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
         const RaceCard = ({ race }) => {
             return (
                 <div className="group relative w-full h-full break-inside-avoid" data-race-id={race.id}>
@@ -609,10 +757,11 @@
                 }, 300);
             }, []);
 
-            // Sorting and Filtering Logic
+            // Sorting and Filtering Logic - Include ALL races
             const processedRaces = useMemo(() => {
                 let data = [...rawRaces];
-                data.sort((a, b) => b.dateObj - a.dateObj);
+                // No longer filtering out upcoming races here, processedRaces will contain all races
+                data.sort((a, b) => b.dateObj - a.dateObj); // Default sort by date descending
 
                 // Filter by type (marathon/triathlon/trail)
                 if (filter !== 'all') {
@@ -634,6 +783,21 @@
                 return data;
             }, [rawRaces, filter, searchQuery]);
 
+            // Split into upcoming and completed races from filtered results
+            const upcomingFiltered = useMemo(() => {
+                const now = new Date();
+                return processedRaces
+                    .filter(r => new Date(r.date) > now)
+                    .sort((a, b) => a.dateObj - b.dateObj); // Sort upcoming by date ascending (nearest first)
+            }, [processedRaces]);
+
+            const completedFiltered = useMemo(() => {
+                const now = new Date();
+                return processedRaces
+                    .filter(r => new Date(r.date) <= now)
+                    .sort((a, b) => b.dateObj - a.dateObj); // Sort completed by date descending (most recent first)
+            }, [processedRaces]);
+
             // Toggle search modal
             const toggleSearch = () => {
                 setIsSearchVisible(!isSearchVisible);
@@ -642,15 +806,18 @@
                 }
             };
 
-            // Calculate Stats
+            // Calculate Stats - Exclude upcoming races
             const stats = useMemo(() => {
-                const completed = rawRaces.length;
+                const now = new Date();
+                // Only count completed races (past races)
+                const completedRaces = rawRaces.filter(r => new Date(r.date) <= now);
+                const completed = completedRaces.length;
 
-                // Categories
-                const fullMarathons = rawRaces.filter(r => r.category === 'Full Marathon');
-                const halfMarathons = rawRaces.filter(r => r.category === 'Half Marathon');
-                const fullIronmans = rawRaces.filter(r => r.category === 'IRONMAN' || r.category === 'IRONMAN Full' || r.category === 'Full Distance' || (r.type === 'triathlon' && r.category.includes('Full')));
-                const ironman703s = rawRaces.filter(r => r.category === 'IRONMAN 70.3' || r.category === 'Olympic Distance');
+                // Categories - only from completed races
+                const fullMarathons = completedRaces.filter(r => r.category === 'Full Marathon');
+                const halfMarathons = completedRaces.filter(r => r.category === 'Half Marathon');
+                const fullIronmans = completedRaces.filter(r => r.category === 'IRONMAN' || r.category === 'IRONMAN Full' || r.category === 'Full Distance' || (r.type === 'triathlon' && r.category.includes('Full')));
+                const ironman703s = completedRaces.filter(r => r.category === 'IRONMAN 70.3' || r.category === 'Olympic Distance');
 
                 // Helper to convert "H:MM:SS" to seconds
                 const timeToSeconds = (timeStr) => {
@@ -676,83 +843,123 @@
             }, [rawRaces]);
 
             return (
-                <div className="min-h-screen bg-neutral dark:bg-neutral-800 text-neutral-900 dark:text-neutral font-sans selection:bg-teal-500/30 pb-20">
-                    {/* Search Modal */}
-                    <SearchModal
-                        isOpen={isSearchVisible}
-                        onClose={() => setIsSearchVisible(false)}
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        filteredRaces={processedRaces}
-                    />
+                <>
+                    <div className="min-h-screen bg-neutral dark:bg-neutral-800 text-neutral-900 dark:text-neutral font-sans selection:bg-teal-500/30 pb-20">
+                        {/* Search Modal */}
+                        <SearchModal
+                            isOpen={isSearchVisible}
+                            onClose={() => setIsSearchVisible(false)}
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                            filteredRaces={processedRaces}
+                        />
 
-                    {/* Navigation Bar - Wrapped in Container Like Homepage */}
-                    <div className="mx-auto max-w-7xl px-6 sm:px-14 md:px-24 lg:px-32">
-                        <div style={{ paddingLeft: 0, paddingRight: 0, paddingTop: '2px', paddingBottom: '3px' }}
-                            className="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start space-x-3">
+                        {/* Navigation Bar - Wrapped in Container Like Homepage */}
+                        <div className="mx-auto max-w-7xl px-6 sm:px-14 md:px-24 lg:px-32">
+                            <div style={{ paddingLeft: 0, paddingRight: 0, paddingTop: '2px', paddingBottom: '3px' }}
+                                className="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start space-x-3">
 
-                            <div className="flex flex-1 items-center justify-between">
-                                <nav className="flex space-x-3">
-                                    <a href="/"
-                                        className="text-2xl font-extrabold text-neutral-900 hover:text-neutral-900 dark:text-white dark:hover:text-white transition-colors">Rollin</a>
-                                </nav>
+                                <div className="flex flex-1 items-center justify-between">
+                                    <nav className="flex space-x-3">
+                                        <a href="/"
+                                            className="text-2xl font-extrabold text-neutral-900 hover:text-neutral-900 dark:text-white dark:hover:text-white transition-colors">Rollin</a>
+                                    </nav>
 
-                                <nav className="hidden md:flex items-center space-x-5 md:ml-12 h-12">
-                                    {/* Sports */}
-                                    <a href="/sports/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
-                                        <span className="mr-1">
-                                            <span className="relative block icon h-5 w-5">
+                                    <nav className="hidden md:flex items-center space-x-5 md:ml-12 h-12">
+                                        {/* Sports */}
+                                        <a href="/sports/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
+                                            <span className="mr-1">
+                                                <span className="relative block icon h-5 w-5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                        <path fill="currentColor"
+                                                            d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+                                                    </svg>
+                                                </span>
+                                            </span>
+                                            <p className="text-base font-medium">Sports</p>
+                                        </a>
+
+                                        {/* Race Log */}
+                                        <a href="/racelog/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
+                                            <span className="mr-1">
+                                                <span className="relative block icon h-5 w-5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                        <path fill="currentColor"
+                                                            d="M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.8 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-2.8-5.6-5.6-11.2-9.8-16.8l-50.6 58.8s-81.4-103.6-87.1-110.6C133.1 243.8 112 273.2 112 306.8C112 37.4 162.6 416 225.7 416z" />
+                                                    </svg>
+                                                </span>
+                                            </span>
+                                            <p className="text-base font-medium">Race Log</p>
+                                        </a>
+
+                                        {/* Work */}
+                                        <a href="/work/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
+                                            <span className="mr-1">
+                                                <span className="relative block icon h-5 w-5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                                        <path fill="currentColor"
+                                                            d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" />
+                                                    </svg>
+                                                </span>
+                                            </span>
+                                            <p className="text-base font-medium">Work</p>
+                                        </a>
+
+                                        {/* Search Button */}
+                                        <button id="search-button" aria-label="Search" title="Search"
+                                            onClick={toggleSearch}
+                                            className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                            <span className="relative block icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                     <path fill="currentColor"
-                                                        d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+                                                        d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
                                                 </svg>
                                             </span>
-                                        </span>
-                                        <p className="text-base font-medium">Sports</p>
-                                    </a>
+                                        </button>
 
-                                    {/* Race Log */}
-                                    <a href="/racelog/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
-                                        <span className="mr-1">
-                                            <span className="relative block icon h-5 w-5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                                                    <path fill="currentColor"
-                                                        d="M159.3 5.4c7.8-7.3 19.9-7.2 27.7 .1c27.6 25.9 53.8 53.8 77.7 84c11-14.4 23.5-30.1 37-42.9c7.9-7.4 20.1-7.4 28 .1c34.6 33 63.9 76.6 84.5 118c20.3 40.8 33.8 82.5 33.8 111.9C448 404.2 348.2 512 224 512C98.4 512 0 404.1 0 276.5c0-38.4 17.8-85.3 45.4-131.7C73.3 97.7 112.7 48.6 159.3 5.4zM225.7 416c25.3 0 47.7-7 68.8-21c42.1-29.4 53.4-88.2 28.1-134.4c-2.8-5.6-5.6-11.2-9.8-16.8l-50.6 58.8s-81.4-103.6-87.1-110.6C133.1 243.8 112 273.2 112 306.8C112 37.4 162.6 416 225.7 416z" />
-                                                </svg>
-                                            </span>
-                                        </span>
-                                        <p className="text-base font-medium">Race Log</p>
-                                    </a>
+                                        {/* Appearance Switcher */}
+                                        <div className="ltr:mr-14 rtl:ml-14 flex items-center">
+                                            <button onClick={toggleDarkMode} id="appearance-switcher" aria-label="Dark mode switcher" type="button"
+                                                className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                                <div className="flex items-center justify-center dark:hidden">
+                                                    <span className="relative block icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                            <path fill="currentColor"
+                                                                d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div className="items-center justify-center hidden dark:flex">
+                                                    <span className="relative block icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                            <path fill="currentColor"
+                                                                d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </nav>
 
-                                    {/* Work */}
-                                    <a href="/work/" className="flex items-center text-neutral-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400">
-                                        <span className="mr-1">
-                                            <span className="relative block icon h-5 w-5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-                                                    <path fill="currentColor"
-                                                        d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" />
-                                                </svg>
-                                            </span>
-                                        </span>
-                                        <p className="text-base font-medium">Work</p>
-                                    </a>
+                                    {/* Mobile Navigation */}
+                                    <div className="flex md:hidden items-center space-x-5 md:ml-12 h-12">
+                                        <span></span>
 
-                                    {/* Search Button */}
-                                    <button id="search-button" aria-label="Search" title="Search"
-                                        onClick={toggleSearch}
-                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400">
-                                        <span className="relative block icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                                <path fill="currentColor"
-                                                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                                            </svg>
-                                        </span>
-                                    </button>
-
-                                    {/* Appearance Switcher */}
-                                    <div className="ltr:mr-14 rtl:ml-14 flex items-center">
-                                        <button onClick={toggleDarkMode} id="appearance-switcher" aria-label="Dark mode switcher" type="button"
+                                        {/* Mobile Search Button */}
+                                        <button id="search-button-mobile" aria-label="Search" title="Search"
+                                            onClick={toggleSearch}
                                             className="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                                            <span className="relative block icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                                                </svg>
+                                            </span>
+                                        </button>
+
+                                        {/* Mobile Appearance Switcher */}
+                                        <button onClick={toggleDarkMode} id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button"
+                                            className="text-base hover:text-primary-600 dark:hover:text-primary-400" style={{ marginRight: '5px' }}>
                                             <div className="flex items-center justify-center dark:hidden">
                                                 <span className="relative block icon">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -770,121 +977,139 @@
                                                 </span>
                                             </div>
                                         </button>
+                                        {/* Mobile Menu Button */}
+                                        <div className="-my-2 -mr-2 md:hidden">
+                                            <div id="menu-button" className="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+                                                <span className="relative block icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                        <path fill="currentColor"
+                                                            d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </nav>
-
-                                {/* Mobile Navigation */}
-                                <div className="flex md:hidden items-center space-x-5 md:ml-12 h-12">
-                                    <span></span>
-
-                                    {/* Mobile Search Button */}
-                                    <button id="search-button-mobile" aria-label="Search" title="Search"
-                                        onClick={toggleSearch}
-                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400">
-                                        <span className="relative block icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                                <path fill="currentColor"
-                                                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                                            </svg>
-                                        </span>
-                                    </button>
-
-                                    {/* Mobile Appearance Switcher */}
-                                    <button onClick={toggleDarkMode} id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button"
-                                        className="text-base hover:text-primary-600 dark:hover:text-primary-400" style={{ marginRight: '5px' }}>
-                                        <div className="flex items-center justify-center dark:hidden">
-                                            <span className="relative block icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-                                                    <path fill="currentColor"
-                                                        d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div className="items-center justify-center hidden dark:flex">
-                                            <span className="relative block icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                                    <path fill="currentColor"
-                                                        d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Mobile Menu Button */}
-                            <div className="-my-2 -mr-2 md:hidden">
-                                <div id="menu-button" className="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
-                                    <span className="relative block icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                                            <path fill="currentColor"
-                                                d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
-                                        </svg>
-                                    </span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {/* Spacer for fixed header */}
-                    <div className="min-h-[80px]"></div>
 
-                    <div className="max-w-7xl mx-auto px-4 md:px-6 mt-[5px]">
+                        {/* Spacer for fixed header */}
+                        <div className="min-h-[80px]"></div>
 
-                        {/* Header Section */}
-                        <header className="mb-16 md:mb-24 pt-0 md:pt-4 text-center relative">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-teal-500/20 blur-[100px] rounded-full pointer-events-none"></div>
-                            <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-neutral-900 dark:text-neutral-50 relative z-10">
-                                RACE<span className="text-teal-500">LOG</span>
-                            </h1>
-                            <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto font-light leading-relaxed">
-                                Tracking every mile, every transition, and every finish line. <br className="hidden md:inline" />A digital trophy room of endurance.
-                            </p>
-                        </header>
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 mt-[5px]">
 
-                        {/* Main Content Area */}
-                        <main>
-                            {/* Top Stats Section */}
-                            <StatsHeader stats={stats} />
+                            {/* Header Section */}
+                            <header className="mb-16 md:mb-24 pt-0 md:pt-4 text-center relative">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-teal-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+                                <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-neutral-900 dark:text-neutral-50 relative z-10">
+                                    RACE<span className="text-teal-500">LOG</span>
+                                </h1>
+                                <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto font-light leading-relaxed">
+                                    Tracking every mile, every transition, and every finish line. <br className="hidden md:inline" />A digital trophy room of endurance.
+                                </p>
+                            </header>
 
-                            {/* Filter Tabs */}
-                            <FilterBar activeFilter={filter} setFilter={setFilter} />
+                            {/* Main Content Area */}
+                            <main>
+                                {/* Top Stats Section */}
+                                <StatsHeader stats={stats} />
 
-                            {/* Timeline / Grid Content */}
-                            {loading ? (
-                                <div className="text-center py-20">
-                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
-                                    <p className="mt-4 text-neutral-400">Loading races...</p>
-                                </div>
-                            ) : processedRaces.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                                    {processedRaces.map((race, index) => (
-                                        <div
-                                            key={race.id}
-                                            className="animate-fade-in-up"
-                                            style={{ animationDelay: `${index * 100}ms` }}
-                                        >
-                                            <RaceCard race={race} />
+                                {/* Filter Tabs */}
+                                <FilterBar activeFilter={filter} setFilter={setFilter} />
+
+                                {/* Upcoming Races Section (if any after filtering) */}
+                                {upcomingFiltered.length > 0 && (
+                                    <div className="mb-12">
+                                        <div className="text-center mb-6">
+                                            <h2 className="text-2xl md:text-3xl font-black text-neutral-800 dark:text-neutral-100 mb-2">
+                                                即将开始的比赛
+                                            </h2>
+                                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                                Upcoming Races
+                                            </p>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 text-neutral-400">
-                                    <div className="inline-block p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
-                                        <Activity size={32} className="opacity-20" />
-                                    </div>
-                                    <p>No races found for this category.</p>
-                                </div>
-                            )}
-                        </main>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                                            {upcomingFiltered.map((race) => (
+                                                <div key={race.id} className="group relative w-full break-inside-avoid">
+                                                    <div className="relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 h-[400px]">
+                                                        {/* Date Badge */}
+                                                        <div className="absolute top-4 right-4 z-30 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm shadow-sm border border-white/20 px-3 py-2 rounded-xl flex flex-col items-center min-w-[50px]">
+                                                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{race.month}</span>
+                                                            <span className="text-lg font-black text-neutral-800 dark:text-neutral-200 leading-none">{race.year}</span>
+                                                        </div>
 
-                        {/* Footer */}
-                        <footer className="mt-24 py-12 text-center border-t border-neutral-200 dark:border-neutral-800/50">
-                            <p className="text-neutral-400 text-sm">
-                                &copy; {new Date().getFullYear()} RaceLog. Keep Pushing.
-                            </p>
-                        </footer>
-                    </div >
-                </div >
+                                                        {/* Countdown Display */}
+                                                        <div className="w-full h-full relative">
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                                                            <Countdown targetDate={race.date} raceTitle={race.title} />
+
+                                                            {/* Overlay Info */}
+                                                            <div className="absolute bottom-0 left-0 w-full p-6 z-20 text-white">
+                                                                <div className="flex flex-wrap gap-2 mb-3">
+                                                                    <div className={`
+                                                                    inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg backdrop-blur-md border text-xs font-bold tracking-wide
+                                                                    ${race.type === 'marathon' ? 'bg-teal-500/20 border-teal-500/30 text-teal-300' : ''}
+                                                                    ${race.type === 'triathlon' ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300' : ''}
+                                                                    ${race.type === 'trail' ? 'bg-amber-500/20 border-amber-500/30 text-amber-300' : ''}
+                                                                `}>
+                                                                        {race.type === 'marathon' && <Activity size={12} />}
+                                                                        {race.type === 'triathlon' && <Trophy size={12} />}
+                                                                        {race.type === 'trail' && <Mountain size={12} />}
+                                                                        {race.category}
+                                                                    </div>
+                                                                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 text-xs text-white/80">
+                                                                        <MapPin size={10} /> {race.location}
+                                                                    </div>
+                                                                </div>
+                                                                <h3 className="text-2xl font-bold leading-tight text-shadow-sm">
+                                                                    {race.title}
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Completed Races Grid */}
+                                {loading ? (
+                                    <div className="text-center py-20">
+                                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+                                        <p className="mt-4 text-neutral-400">Loading races...</p>
+                                    </div>
+                                ) : completedFiltered.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                                        {completedFiltered.map((race, index) => (
+                                            <div
+                                                key={race.id}
+                                                className="animate-fade-in-up"
+                                                style={{ animationDelay: `${index * 100}ms` }}
+                                            >
+                                                <RaceCard race={race} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-20 text-neutral-400">
+                                        <div className="inline-block p-4 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
+                                            <Activity size={32} className="opacity-20" />
+                                        </div>
+                                        <p>No races found for this category.</p>
+                                    </div>
+                                )}
+                            </main>
+
+                            {/* Footer */}
+                            <footer className="mt-24 py-12 text-center border-t border-neutral-200 dark:border-neutral-800/50">
+                                <p className="text-neutral-400 text-sm">
+                                    &copy; {new Date().getFullYear()} RaceLog. Keep Pushing.
+                                </p>
+                            </footer>
+                        </div>
+                    </div>
+                </>
             );
         };
 
