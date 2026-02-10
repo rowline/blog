@@ -60,6 +60,50 @@
       /* Nav has space-x-5 (20px) built-in, override redundant margin */
     }
 
+    /* Mobile: Show search and appearance switcher buttons on small screens */
+    @media (max-width: 767px) {
+
+      /* Position button container to match homepage layout */
+      nav.hidden {
+        display: flex !important;
+        position: absolute !important;
+        right: 61px !important;
+        /* 17px gap from hamburger menu, matching homepage */
+        top: 12px !important;
+        /* Vertically centered in 40px header */
+        height: auto !important;
+        align-items: center !important;
+        z-index: 40 !important;
+        gap: 20px !important;
+        /* 20px gap between search and switcher buttons, matching homepage */
+      }
+
+      /* Reset button margins - spacing controlled by gap */
+      #search-button {
+        margin-left: 0 !important;
+        display: flex !important;
+      }
+
+      button[aria-label="Dark mode switcher"] {
+        margin-left: 0 !important;
+        display: flex !important;
+      }
+
+      /* Hide the navigation links on mobile (they're in hamburger menu) */
+      nav.hidden a[href="/sports/"],
+      nav.hidden a[href="/racelog/"],
+      nav.hidden a[href="/work/"] {
+        display: none !important;
+      }
+
+      /* Ensure button container children are visible */
+      nav.hidden #search-button,
+      nav.hidden button[aria-label="Dark mode switcher"],
+      nav.hidden .ltr\:mr-14 {
+        display: flex !important;
+      }
+    }
+
     /* Use html.dark selector instead of media query to match site's dark mode implementation */
     html.dark a[href="/"],
     html.dark a[href="/sports/"],
