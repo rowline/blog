@@ -2,7 +2,7 @@ window.RACE_DATA = [
     // --- TEST RACE (FUTURE) ---
     {
         title: "2026膳美师·宁波马拉松",
-        date: "2026-06-15",
+        date: "2026-03-15",
         type: "marathon",
         category: "Half Marathon",
         finishTime: "TBD",
