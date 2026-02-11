@@ -14,14 +14,14 @@
     "src": "assets/start.svg"
   },
   "index.css": {
-    "file": "assets/index-7777dee1.css",
+    "file": "assets/index-609ad2c6.css",
     "src": "index.css"
   },
   "index.html": {
     "css": [
-      "assets/index-7777dee1.css"
+      "assets/index-609ad2c6.css"
     ],
-    "file": "assets/index-e1cf1508.js",
+    "file": "assets/index-1084af91.js",
     "imports": [
       "_vendors-32691e81.js",
       "_activities-2c924bce.js"
