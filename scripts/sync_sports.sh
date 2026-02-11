@@ -16,6 +16,7 @@ echo "Starting sports page sync..."
 
 # Clean up old sports page assets to avoid accumulation of hashed files
 echo "Cleaning up old assets in $SPORTS_PAGE_DIR..."
+mkdir -p "$SPORTS_PAGE_DIR"
 # Keep index.html if it's there? Probably not, as it's generated.
 # But let's be careful. The workout_page build produces index.html and assets.
 # We should probably remove everything in static/sports to be safe, assuming it's all generated.

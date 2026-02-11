@@ -7,9 +7,21 @@ window.RACE_DATA = [
         category: "Half Marathon",
         finishTime: "TBD",
         pace: "",
-        image: "/images/races/2025-Nanjing.jpg",
+        image: "/images/races/2026-Ningbo.jpg",
         location: "Ningbo",
         month: "MAR",
+        year: "2026"
+    },
+    {
+        title: "2026淮安西游乐园·淮安马拉松",
+        date: "2026-04-12",
+        type: "marathon",
+        category: "Full Marathon",
+        finishTime: "TBD",
+        pace: "",
+        image: "/images/races/2026-Huaian.jpg",
+        location: "Huaian",
+        month: "APR",
         year: "2026"
     },
     {
@@ -19,7 +31,7 @@ window.RACE_DATA = [
         category: "Ironman 70.3",
         finishTime: "TBD",
         pace: "",
-        image: "/images/races/2025-Nanjing.jpg",
+        image: "/images/races/2026-Xiamen.jpg",
         location: "Xiamen",
         month: "NOV",
         year: "2026"
