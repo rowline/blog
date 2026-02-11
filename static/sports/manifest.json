@@ -1,0 +1,32 @@
+{
+  "_activities-2c924bce.js": {
+    "file": "assets/activities-2c924bce.js"
+  },
+  "_vendors-25f987e2.js": {
+    "file": "assets/vendors-25f987e2.js"
+  },
+  "assets/end.svg": {
+    "file": "assets/end-a91503f9.svg",
+    "src": "assets/end.svg"
+  },
+  "assets/start.svg": {
+    "file": "assets/start-2a9d06f3.svg",
+    "src": "assets/start.svg"
+  },
+  "index.css": {
+    "file": "assets/index-2799cbcb.css",
+    "src": "index.css"
+  },
+  "index.html": {
+    "css": [
+      "assets/index-2799cbcb.css"
+    ],
+    "file": "assets/index-a0f40772.js",
+    "imports": [
+      "_vendors-25f987e2.js",
+      "_activities-2c924bce.js"
+    ],
+    "isEntry": true,
+    "src": "index.html"
+  }
+}
