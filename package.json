@@ -11,7 +11,8 @@
     "build-windows": "set NODE_ENV=production&&node ./node_modules/tailwindcss/lib/cli.js -i ./assets/css/main.css -o ./assets/css/compiled/main.css --jit",
     "build-hugo": "hugo --minify -s exampleSite --themesDir ../.. -d ../docs --baseURL https://nunocoracao.github.io/blowfish/",
     "example": "hugo server -E -F --minify --source exampleSite --themesDir ../.. --buildDrafts -b http://localhost/ -p 1313",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "sync:sports": "./scripts/sync_sports.sh"
   },
   "repository": {
     "type": "git",
