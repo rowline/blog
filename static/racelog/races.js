@@ -1,18 +1,6 @@
 window.RACE_DATA = [
     // --- TEST RACE (FUTURE) ---
     {
-        title: "2026膳美师·宁波马拉松",
-        date: "2026-03-15",
-        type: "marathon",
-        category: "Half Marathon",
-        finishTime: "TBD",
-        pace: "",
-        image: "/images/races/2026-Ningbo.jpg",
-        location: "Ningbo",
-        month: "MAR",
-        year: "2026"
-    },
-    {
         title: "2026淮安西游乐园·淮安马拉松",
         date: "2026-04-12",
         type: "marathon",
@@ -38,6 +26,18 @@ window.RACE_DATA = [
     },
 
     // --- 2025 RACES ---
+    {
+        title: "2026膳美师·宁波马拉松",
+        date: "2026-03-15",
+        type: "marathon",
+        category: "Half Marathon",
+        finishTime: "1:59:44",
+        pace: "",
+        image: "/images/races/2026-Ningbo.jpeg",
+        location: "Ningbo",
+        month: "MAR",
+        year: "2026"
+    },
     {
         title: "2025南京银行南京马拉松",
         date: "2025-11-16",

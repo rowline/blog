@@ -4,6 +4,8 @@ module.exports = {
     "./content/**/*.{html,md}",
     "./themes/blowfish/layouts/**/*.html",
     "./themes/blowfish/content/**/*.{html,md}",
+    "./static/racelog/**/*.js",
+    "./static/sports/assets/**/*.js",
     "./node_modules/tw-elements/js/**/*.js"
   ],
   darkMode: "class",

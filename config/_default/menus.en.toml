@@ -2,18 +2,11 @@
 none = "none"
 
 [[main]]
-name = "Work"
-pre = "code"
-url = "/work/"
-identifier = "VaYIUAQowd"
+name = "Blog"
+pre = "pencil"
+url = "/blog/"
+identifier = "blog"
 weight = 9999
-
-[[main]]
-name = "Sports"
-pre = "heart"
-url = "/sports/"
-identifier = "qPYLstBD77"
-weight = 20
 
 [[main]]
 name = "Race Log"
