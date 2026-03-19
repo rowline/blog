@@ -2,22 +2,18 @@
 title: "Home"
 date: 2026-03-18
 ---
-
-<div class="text-center mt-6 mb-8 px-4">
-  <h1 class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 text-4xl md:text-5xl lg:text-7xl font-black mb-6 tracking-tight leading-loose drop-shadow-sm pb-2">Product Planner <br class="md:hidden" />& Indie Vibe Coder</h1>
-
-  {{< lead >}}
-  白天致力于智能机器人的产品规划与落地，夜晚沉浸在 AI 驱动的全栈开发与独立产品的世界里。此外，我也是一名铁人三项爱好者。
-
-  Bridging the gap between robotics product planning and rapid AI-driven software development.
-  {{< /lead >}}
-</div>
-
 <div class="flex justify-center gap-3 flex-wrap mb-16 px-2">
   <span class="px-5 py-2 bg-blue-100/80 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 rounded-full text-sm font-bold shadow-sm backdrop-blur-sm border border-blue-200 dark:border-blue-800/60 transition-transform hover:-translate-y-1">Product Planner</span>
   <span class="px-5 py-2 bg-rose-100/80 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300 rounded-full text-sm font-bold shadow-sm backdrop-blur-sm border border-rose-200 dark:border-rose-800/60 transition-transform hover:-translate-y-1">Triathlete</span>
-  <span class="px-5 py-2 bg-fuchsia-100/80 text-fuchsia-800 dark:bg-fuchsia-900/50 dark:text-fuchsia-300 rounded-full text-sm font-bold shadow-sm backdrop-blur-sm border border-fuchsia-200 dark:border-fuchsia-800/60 transition-transform hover:-translate-y-1">Indie Hacker</span>
   <span class="px-5 py-2 bg-emerald-100/80 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-full text-sm font-bold shadow-sm backdrop-blur-sm border border-emerald-200 dark:border-emerald-800/60 transition-transform hover:-translate-y-1">AI Vibe Coder</span>
+</div>
+
+<div class="text-center mt-6 mb-8 px-4">
+  {{< lead >}}
+  白天致力于智能机器人的产品规划与落地，夜晚沉浸在 AI 驱动的全栈开发与独立产品的世界里。
+  <br />
+  Bridging the gap between robotics product planning and rapid AI-driven software development.
+  {{< /lead >}}
 </div>
 
 

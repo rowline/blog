@@ -525,31 +525,8 @@
         const App = () => {
             // State Management
             const [filter, setFilter] = useState('all');
-            const [isDark, setIsDark] = useState(false);
             const [searchQuery, setSearchQuery] = useState('');
             const [isSearchVisible, setIsSearchVisible] = useState(false);
-
-            React.useEffect(() => {
-                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    setIsDark(true);
-                    document.documentElement.classList.add('dark');
-                } else {
-                    setIsDark(false);
-                    document.documentElement.classList.remove('dark');
-                }
-            }, []);
-
-            const toggleDarkMode = () => {
-                const newIsDark = !isDark;
-                setIsDark(newIsDark);
-                if (newIsDark) {
-                    document.documentElement.classList.add('dark');
-                    localStorage.theme = 'dark';
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.theme = 'light';
-                }
-            };
 
             // Data State
             const [rawRaces, setRawRaces] = useState([]);
