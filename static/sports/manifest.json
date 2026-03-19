@@ -1,6 +1,6 @@
 {
-  "_activities-2c924bce.js": {
-    "file": "assets/activities-2c924bce.js"
+  "_activities-746a13e1.js": {
+    "file": "assets/activities-746a13e1.js"
   },
   "_vendors-32691e81.js": {
     "file": "assets/vendors-32691e81.js"
@@ -14,17 +14,17 @@
     "src": "assets/start.svg"
   },
   "index.css": {
-    "file": "assets/index-0eec72b1.css",
+    "file": "assets/index-711911b4.css",
     "src": "index.css"
   },
   "index.html": {
     "css": [
-      "assets/index-0eec72b1.css"
+      "assets/index-711911b4.css"
     ],
-    "file": "assets/index-8cced400.js",
+    "file": "assets/index-0b13c0fa.js",
     "imports": [
       "_vendors-32691e81.js",
-      "_activities-2c924bce.js"
+      "_activities-746a13e1.js"
     ],
     "isEntry": true,
     "src": "index.html"
