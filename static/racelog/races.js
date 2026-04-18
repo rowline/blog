@@ -1,18 +1,6 @@
 window.RACE_DATA = [
     // --- TEST RACE (FUTURE) ---
     {
-        title: "2026淮安西游乐园·淮安马拉松",
-        date: "2026-04-12",
-        type: "marathon",
-        category: "Full Marathon",
-        finishTime: "TBD",
-        pace: "",
-        image: "/images/races/2026-Huaian.jpg",
-        location: "Huaian",
-        month: "APR",
-        year: "2026"
-    },
-    {
         title: "2026厦门铁人三项公开赛",
         date: "2026-11-08",
         type: "triathlon",
@@ -26,6 +14,18 @@ window.RACE_DATA = [
     },
 
     // --- 2025 RACES ---
+    {
+        title: "2026淮安西游乐园·淮安马拉松",
+        date: "2026-04-12",
+        type: "marathon",
+        category: "Full Marathon",
+        finishTime: "03:26:35",
+        pace: "",
+        image: "/images/races/2026-Huaian.jpg",
+        location: "Huaian",
+        month: "APR",
+        year: "2026"
+    },
     {
         title: "2026膳美师·宁波马拉松",
         date: "2026-03-15",
